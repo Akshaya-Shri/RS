@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { useCart } from '@/components/cart/CartProvider';
 
 export default function CheckoutPage() {
@@ -86,30 +87,11 @@ export default function CheckoutPage() {
                 <div className="relative p-4 bg-white rounded-2xl shadow-xl border border-neutral-100 w-64 h-64 flex flex-col items-center justify-center">
                    <div className="absolute inset-0 border-2 border-dashed border-primary/50 rounded-2xl opacity-50 pulse-border"></div>
                    
-                   {/* Fake QR using SVG pattern */}
-                   <svg width="180" height="180" xmlns="http://www.w3.org/2000/svg" className="opacity-90">
-                      <rect width="180" height="180" fill="#f8fafc" />
-                      {/* Top Left Corner */}
-                      <rect x="10" y="10" width="40" height="40" fill="none" stroke="#171717" strokeWidth="8" />
-                      <rect x="25" y="25" width="10" height="10" fill="#171717" />
-                      {/* Top Right Corner */}
-                      <rect x="130" y="10" width="40" height="40" fill="none" stroke="#171717" strokeWidth="8" />
-                      <rect x="145" y="25" width="10" height="10" fill="#171717" />
-                      {/* Bottom Left Corner */}
-                      <rect x="10" y="130" width="40" height="40" fill="none" stroke="#171717" strokeWidth="8" />
-                      <rect x="25" y="145" width="10" height="10" fill="#171717" />
-                      
-                      {/* Random Data Pattern */}
-                      <circle cx="90" cy="90" r="30" fill="#171717" opacity="0.1" />
-                      {Array.from({length: 40}).map((_, i) => (
-                         <rect key={i} x={10 + (i%8)*20} y={60 + Math.floor(i/8)*20} width="10" height="10" fill="#171717" opacity={Math.random() > 0.5 ? 1 : 0} />
-                      ))}
-                      
-                      {/* Center Logo Area */}
-                      <circle cx="90" cy="90" r="15" fill="white" />
-                      <path d="M90 80 Q80 95 80 100 A10 10 0 0 0 100 100 Q100 95 90 80 Z" fill="#1B5E20" />
-                   </svg>
-                   <p className="mt-4 text-xs font-bold text-neutral-500 uppercase tracking-widest text-center">GPay • PhonePe<br/>Paytm</p>
+                   {/* Real QR using uploaded QR */}
+                   <div className="relative w-[180px] h-[180px] z-10 bg-white p-2 rounded-xl">
+                      <Image src="/images/qr-payment.png" alt="Payment QR Code" fill className="object-contain" unoptimized />
+                   </div>
+                   <p className="mt-4 text-xs font-bold text-neutral-500 uppercase tracking-widest text-center z-10 relative">GPay • PhonePe<br/>Paytm</p>
                 </div>
 
                 <div className="flex-1 w-full space-y-6">

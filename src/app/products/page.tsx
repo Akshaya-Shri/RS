@@ -1,30 +1,28 @@
 import Link from 'next/link';
 import Image from 'next/image';
+import fs from 'fs';
+import path from 'path';
 
 export const metadata = {
   title: 'All Products | Revathi Store',
   description: 'Shop pure, cold-pressed oils. Groundnut, coconut, sesame, castor, and deepam oils available.'
 };
 
-const DUMMY_PRODUCTS = [
-  { id: 1, name: 'Cold Pressed Groundnut Oil', price: 220, category: 'groundnut', slug: 'groundnut-oil', imageUrl: '/images/Oilimages/groundnutoil.png' },
-  { id: 2, name: 'Cold Pressed Coconut Oil', price: 300, category: 'coconut', slug: 'coconut-oil', imageUrl: '/images/Oilimages/cocunutoil.png' },
-  { id: 3, name: 'Cold Pressed Sesame Oil', price: 350, category: 'sesame', slug: 'sesame-oil', imageUrl: '/images/Oilimages/sesameoil.png' },
-  { id: 4, name: 'Pure Castor Oil', price: 180, category: 'castor', slug: 'castor-oil', imageUrl: '/images/Oilimages/castoroil.png' },
-  { id: 5, name: 'Special Deepam Oil', price: 120, category: 'deepam', slug: 'deepam-oil', imageUrl: '/images/Oilimages/deepamoil.png' },
-];
-
 export default async function ProductsPage({
   searchParams,
 }: {
   searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
 }) {
+  const filePath = path.join(process.cwd(), 'src/data/products.json');
+  const fileContents = fs.readFileSync(filePath, 'utf8');
+  const products = JSON.parse(fileContents);
+
   const resolvedSearchParams = await searchParams;
   const categoryFilter = resolvedSearchParams?.category as string;
   
   const filteredProducts = categoryFilter 
-    ? DUMMY_PRODUCTS.filter(p => p.category === categoryFilter)
-    : DUMMY_PRODUCTS;
+    ? products.filter((p: any) => p.category === categoryFilter)
+    : products;
 
   return (
     <main className="flex-1 bg-surface py-12">
@@ -50,7 +48,7 @@ export default async function ProductsPage({
 
         {/* Product Grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
-          {filteredProducts.map(product => (
+          {filteredProducts.map((product: any) => (
             <div key={product.id} className="bg-white rounded-2xl p-6 shadow-sm border border-neutral-100 lift-effect group flex flex-col items-center">
               
               <Link href={`/products/${product.slug}`} className="block w-48 h-48 relative mb-6">

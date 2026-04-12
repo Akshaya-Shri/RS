@@ -9,7 +9,7 @@ export default function ContactPage() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center max-w-2xl mx-auto mb-16">
           <h1 className="text-4xl font-bold text-primary mb-4">Get In Touch</h1>
-          <p className="text-xl text-neutral-600 font-inter">We'd love to hear from you. Experience the purity of our cold pressed oils.</p>
+          <p className="text-xl text-neutral-600 font-inter">We&apos;d love to hear from you. Experience the purity of our cold pressed oils.</p>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">

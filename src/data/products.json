@@ -1,0 +1,115 @@
+[
+  {
+    "id": 1,
+    "name": "Cold Pressed Groundnut Oil",
+    "price": 220,
+    "category": "groundnut",
+    "slug": "groundnut-oil",
+    "imageUrl": "/images/Oilimages/groundnutoil.png",
+    "sizes": [
+      "100ml",
+      "500ml",
+      "1L",
+      "5L",
+      "15L (Tin)"
+    ],
+    "description": "Extracted using traditional wooden cold-press (chekku) methods, ensuring all natural nutrients and authentic aroma are preserved. Ideal for everyday cooking, deep frying, and traditional recipes.",
+    "benefits": [
+      "Rich in heart-healthy MUFA",
+      "Contains natural antioxidants",
+      "No chemical refining or bleaching",
+      "Source of Vitamin E"
+    ],
+    "usage": "Suitable for high-heat cooking and raw consumption."
+  },
+  {
+    "id": 2,
+    "name": "Cold Pressed Coconut Oil",
+    "price": 300,
+    "category": "coconut",
+    "slug": "coconut-oil",
+    "imageUrl": "/images/Oilimages/cocunutoil.png",
+    "sizes": [
+      "100ml",
+      "250ml",
+      "500ml",
+      "1L",
+      "5L"
+    ],
+    "description": "Extracted using traditional wooden cold-press (chekku) methods, ensuring all natural nutrients and authentic aroma are preserved. Perfect for baking, frying, skin, and hair care.",
+    "benefits": [
+      "Rich in Medium Chain Triglycerides (MCTs)",
+      "Supports skin and hair health",
+      "No chemical refining or bleaching",
+      "Antibacterial and antifungal properties"
+    ],
+    "usage": "Suitable for cooking, baking, and direct application to skin or hair."
+  },
+  {
+    "id": 3,
+    "name": "Cold Pressed Sesame Oil",
+    "price": 350,
+    "category": "sesame",
+    "slug": "sesame-oil",
+    "imageUrl": "/images/Oilimages/sesameoil.png",
+    "sizes": [
+      "100ml",
+      "500ml",
+      "1L",
+      "5L",
+      "15L (Tin)"
+    ],
+    "description": "Extracted using traditional wooden cold-press (chekku) methods, ensuring all natural nutrients and authentic aroma are preserved. Essential for traditional South Indian cooking and Ayurvedic practices.",
+    "benefits": [
+      "High in lignans and antioxidants",
+      "Beneficial for oil pulling",
+      "No chemical refining or bleaching",
+      "Excellent shelf stability naturally"
+    ],
+    "usage": "Suitable for cooking, flavoring gravies, and Ayurvedic therapies."
+  },
+  {
+    "id": 4,
+    "name": "Pure Castor Oil",
+    "price": 180,
+    "category": "castor",
+    "slug": "castor-oil",
+    "imageUrl": "/images/Oilimages/castoroil.png",
+    "sizes": [
+      "100ml",
+      "250ml",
+      "500ml",
+      "1L"
+    ],
+    "description": "Cold-pressed pure castor oil, carefully extracted to maintain maximum therapeutic properties. Widely used for both health, wellness, and beauty routines.",
+    "benefits": [
+      "Promotes hair thickening and growth",
+      "Highly moisturizing for dry skin",
+      "No chemical refining or bleaching",
+      "Natural laxative properties"
+    ],
+    "usage": "Suitable for external skin and hair application, and specific traditional wellness uses."
+  },
+  {
+    "id": 5,
+    "name": "Special Deepam Oil",
+    "price": 120,
+    "category": "deepam",
+    "slug": "deepam-oil",
+    "imageUrl": "/images/Oilimages/deepamoil.png",
+    "sizes": [
+      "250ml",
+      "500ml",
+      "1L",
+      "5L"
+    ],
+    "description": "A traditional blend specifically crafted for lighting lamps (diyas). Made from pure, non-edible oils carefully mixed to ensure a long-lasting, soot-free flame representing purity and devotion.",
+    "benefits": [
+      "Long-lasting and steady flame",
+      "Soot-free and clean burning",
+      "Blended specifically for auspicious occasions",
+      "Not for consumption"
+    ],
+    "usage": "Strictly for lighting diyas and spiritual lamps. Not for human consumption."
+  }
+]

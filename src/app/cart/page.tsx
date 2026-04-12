@@ -28,7 +28,7 @@ export default function CartPage() {
               </svg>
             </div>
             <h2 className="text-2xl font-bold text-foreground mb-4">Your cart is empty</h2>
-            <p className="text-neutral-500 mb-8 max-w-sm">Looks like you haven't added any pure cold-pressed oils to your cart yet.</p>
+            <p className="text-neutral-500 mb-8 max-w-sm">Looks like you haven&apos;t added any pure cold-pressed oils to your cart yet.</p>
             <Link href="/products" className="px-8 py-4 bg-primary text-white font-bold rounded-xl hover:bg-primary/90 transition-all shadow-lg shadow-primary/20">
               Start Shopping
             </Link>

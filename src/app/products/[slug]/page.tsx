@@ -2,6 +2,10 @@ import Link from 'next/link';
 import Image from 'next/image';
 import AddToCartSection from '@/components/ui/AddToCartSection';
 
+import fs from 'fs';
+import path from 'path';
+import { notFound } from 'next/navigation';
+
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
   return {
@@ -12,28 +16,17 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
 export default async function ProductDetailPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
 
-  const product = {
-    name: slug.split('-').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' '),
-    price: 350,
-    sizes: ['100ml', '500ml', '1L', '5L', '15L (Tin)'],
-    description: "Extracted using traditional wooden cold-press (chekku) methods, ensuring all natural nutrients and authentic aroma are preserved. Ideal for everyday cooking, deep frying, and traditional recipes.",
-    benefits: [
-      "Rich in heart-healthy MUFA",
-      "Contains natural antioxidants",
-      "No chemical refining or bleaching",
-      "Source of Vitamin E"
-    ],
-    usage: "Suitable for high-heat cooking and raw consumption."
-  };
+  const filePath = path.join(process.cwd(), 'src/data/products.json');
+  const fileContents = fs.readFileSync(filePath, 'utf8');
+  const products = JSON.parse(fileContents);
+  
+  const product = products.find((p: any) => p.slug === slug);
 
-  const productImageMap: Record<string, string> = {
-    'groundnut-oil': '/images/Oilimages/groundnutoil.png',
-    'coconut-oil': '/images/Oilimages/cocunutoil.png',
-    'sesame-oil': '/images/Oilimages/sesameoil.png',
-    'castor-oil': '/images/Oilimages/castoroil.png',
-    'deepam-oil': '/images/Oilimages/deepamoil.png',
-  };
-  const imageUrl = productImageMap[slug] || '/images/Oilimages/groundnutoil.png';
+  if (!product) {
+    notFound();
+  }
+
+  const imageUrl = product.imageUrl || '/images/Oilimages/groundnutoil.png';
 
   return (
     <main className="flex-1 bg-surface py-12">
@@ -80,7 +73,7 @@ export default async function ProductDetailPage({ params }: { params: Promise<{ 
                     Key Benefits
                  </h3>
                  <ul className="list-disc list-inside text-neutral-600 space-y-1 ml-2 font-inter">
-                   {product.benefits.map((b, i) => <li key={i}>{b}</li>)}
+                   {product.benefits.map((b: string, i: number) => <li key={i}>{b}</li>)}
                  </ul>
                </div>
 
