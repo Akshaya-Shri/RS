@@ -7,11 +7,13 @@ import { NextResponse } from 'next/server';
 async function sendWhatsAppMessage(phoneNumber: string, message: string) {
   try {
     const provider = process.env.WHATSAPP_PROVIDER || 'twilio';
-    
+
     if (provider === 'twilio') {
       return await sendTwilioMessage(phoneNumber, message);
     } else if (provider === 'infobip') {
       return await sendInfobipMessage(phoneNumber, message);
+    } else if (provider === 'meta') {
+      return await sendMetaWhatsAppMessage(phoneNumber, message);
     } else {
       console.warn('No valid WhatsApp provider configured');
       return { success: false, message: 'WhatsApp provider not configured' };
@@ -101,6 +103,48 @@ async function sendInfobipMessage(phoneNumber: string, message: string) {
   } catch (error) {
     console.error('Infobip error:', error);
     return { success: false, message: 'Failed to send via Infobip' };
+  }
+}
+
+// Meta WhatsApp Business API implementation
+async function sendMetaWhatsAppMessage(phoneNumber: string, message: string) {
+  const phoneNumberId = process.env.META_WHATSAPP_PHONE_NUMBER_ID;
+  const accessToken = process.env.META_WHATSAPP_ACCESS_TOKEN;
+  const apiVersion = process.env.META_WHATSAPP_API_VERSION || 'v17.0';
+
+  if (!phoneNumberId || !accessToken) {
+    console.warn('Meta WhatsApp credentials not configured');
+    return { success: false, message: 'Meta WhatsApp not configured' };
+  }
+
+  const url = `https://graph.facebook.com/${apiVersion}/${phoneNumberId}/messages`;
+
+  try {
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${accessToken}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        messaging_product: 'whatsapp',
+        to: `91${phoneNumber}`,
+        type: 'text',
+        text: {
+          body: message,
+        },
+      }),
+    });
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      throw new Error(`Meta WhatsApp API error: ${response.statusText} ${errorText}`);
+    }
+
+    return { success: true, message: 'WhatsApp message sent via Meta Business API' };
+  } catch (error) {
+    console.error('Meta WhatsApp error:', error);
+    return { success: false, message: 'Failed to send via Meta WhatsApp Business API' };
   }
 }
 

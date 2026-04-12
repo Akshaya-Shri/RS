@@ -57,6 +57,25 @@ INFOBIP_SENDER=YourBusinessName
 NEXT_PUBLIC_BASE_URL=http://localhost:3000
 ```
 
+#### Option 3: Meta WhatsApp Business API (Recommended for true WhatsApp Business)
+
+1. **Set up a WhatsApp Business Account**
+   - Create a Meta Business Manager account
+   - Add a WhatsApp Business phone number or use a number from your business account
+   - Get the Phone Number ID and access token from the Meta for Developers dashboard
+
+2. **Add to .env.local:**
+```env
+WHATSAPP_PROVIDER=meta
+META_WHATSAPP_PHONE_NUMBER_ID=your_phone_number_id
+META_WHATSAPP_ACCESS_TOKEN=your_long_lived_access_token
+META_WHATSAPP_API_VERSION=v17.0
+NEXT_PUBLIC_BASE_URL=http://localhost:3000
+```
+
+> With Meta WhatsApp Business API, you can send official transactional updates using your verified business number.
+
+
 #### Option 3: Other Providers (WhatsApp Business API, Waxia, etc.)
 You can extend the code in `/api/notify/whatsapp/route.ts` to support other providers.
 
@@ -65,7 +84,7 @@ You can extend the code in `/api/notify/whatsapp/route.ts` to support other prov
 Required in `.env.local`:
 
 ```env
-# Choose provider: twilio or infobip
+# Choose provider: twilio, infobip, or meta
 WHATSAPP_PROVIDER=twilio
 
 # Twilio Config (if using Twilio)
@@ -76,6 +95,11 @@ TWILIO_WHATSAPP_NUMBER=
 # Infobip Config (if using Infobip)
 INFOBIP_API_KEY=
 INFOBIP_SENDER=
+
+# Meta WhatsApp Business API Config (if using meta)
+META_WHATSAPP_PHONE_NUMBER_ID=
+META_WHATSAPP_ACCESS_TOKEN=
+META_WHATSAPP_API_VERSION=v17.0
 
 # Base URL (for notifications to work in production)
 NEXT_PUBLIC_BASE_URL=http://localhost:3000
