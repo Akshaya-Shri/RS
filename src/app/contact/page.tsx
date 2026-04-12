@@ -41,20 +41,18 @@ export default function ContactPage() {
                  </div>
               </div>
 
-              {/* Animated Map Placeholder */}
-              <div className="bg-white p-4 rounded-3xl shadow-sm border border-neutral-100 h-64 relative overflow-hidden flex items-center justify-center">
-                 <div className="absolute inset-0 bg-neutral-100 opacity-50"></div>
-                 {/* Map Marker Animation */}
-                 <div className="relative z-10 flex flex-col items-center">
-                    <div className="w-12 h-12 bg-primary rounded-full flex items-center justify-center shadow-lg relative glow-effect">
-                       <div className="absolute inset-0 border-4 border-primary rounded-full animate-ping opacity-50"></div>
-                       <svg className="w-6 h-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-                       </svg>
-                    </div>
-                    <div className="w-4 h-1 bg-black/20 rounded-[100%] mt-2 blur-[2px]"></div>
-                 </div>
+              {/* Interactive Google Map */}
+              <div className="bg-white p-2 rounded-3xl shadow-sm border border-neutral-100 h-[400px] relative overflow-hidden flex items-center justify-center group lift-effect">
+                 <iframe 
+                   src="https://www.google.com/maps/embed?pb=!1m17!1m12!1m3!1d3929.062986187607!2d77.47522287503135!3d10.011656190094335!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m2!1m1!2zMTDCsDAwJzQyLjAiTiA3N8KwMjgnNDAuMSJF!5e0!3m2!1sen!2sin!4v1775975420850!5m2!1sen!2sin" 
+                   width="100%" 
+                   height="100%" 
+                   style={{ border: 0 }} 
+                   allowFullScreen={true} 
+                   loading="lazy" 
+                   referrerPolicy="no-referrer-when-downgrade"
+                   className="rounded-2xl w-full h-full"
+                 ></iframe>
               </div>
            </div>
 
