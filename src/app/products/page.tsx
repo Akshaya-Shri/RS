@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import CategoryIcons from '@/components/ui/CategoryIcons';
+import Image from 'next/image';
 
 export const metadata = {
   title: 'All Products | Revathi Store',
@@ -7,11 +7,11 @@ export const metadata = {
 };
 
 const DUMMY_PRODUCTS = [
-  { id: 1, name: 'Cold Pressed Groundnut Oil', price: 220, category: 'groundnut', slug: 'groundnut-oil', imageType: 'groundnut' },
-  { id: 2, name: 'Cold Pressed Coconut Oil', price: 300, category: 'coconut', slug: 'coconut-oil', imageType: 'coconut' },
-  { id: 3, name: 'Cold Pressed Sesame Oil', price: 350, category: 'sesame', slug: 'sesame-oil', imageType: 'sesame' },
-  { id: 4, name: 'Pure Castor Oil', price: 180, category: 'castor', slug: 'castor-oil', imageType: 'castor' },
-  { id: 5, name: 'Special Deepam Oil', price: 120, category: 'deepam', slug: 'deepam-oil', imageType: 'deepam' },
+  { id: 1, name: 'Cold Pressed Groundnut Oil', price: 220, category: 'groundnut', slug: 'groundnut-oil', imageUrl: '/images/Oilimages/groundnutoil.png' },
+  { id: 2, name: 'Cold Pressed Coconut Oil', price: 300, category: 'coconut', slug: 'coconut-oil', imageUrl: '/images/Oilimages/cocunutoil.png' },
+  { id: 3, name: 'Cold Pressed Sesame Oil', price: 350, category: 'sesame', slug: 'sesame-oil', imageUrl: '/images/Oilimages/sesameoil.png' },
+  { id: 4, name: 'Pure Castor Oil', price: 180, category: 'castor', slug: 'castor-oil', imageUrl: '/images/Oilimages/castoroil.png' },
+  { id: 5, name: 'Special Deepam Oil', price: 120, category: 'deepam', slug: 'deepam-oil', imageUrl: '/images/Oilimages/deepamoil.png' },
 ];
 
 export default async function ProductsPage({
@@ -54,8 +54,8 @@ export default async function ProductsPage({
             <div key={product.id} className="bg-white rounded-2xl p-6 shadow-sm border border-neutral-100 lift-effect group flex flex-col items-center">
               
               <Link href={`/products/${product.slug}`} className="block w-48 h-48 relative mb-6">
-                 <div className="absolute inset-0 bg-neutral-50 rounded-full group-hover:bg-primary/5 transition-colors flex items-center justify-center p-4">
-                    <CategoryIcons type={product.imageType as any} className="w-full h-full" />
+                 <div className="absolute inset-0 bg-neutral-50 rounded-full group-hover:bg-primary/5 transition-colors flex items-center justify-center overflow-hidden border-4 border-white shadow-sm">
+                    <Image src={product.imageUrl} alt={product.name} fill className="object-cover p-2" />
                  </div>
               </Link>
               

@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import OilPourHeroSVG from '@/components/ui/OilPourHeroSVG';
+import Image from 'next/image';
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
@@ -25,6 +25,15 @@ export default async function ProductDetailPage({ params }: { params: Promise<{ 
     usage: "Suitable for high-heat cooking and raw consumption."
   };
 
+  const productImageMap: Record<string, string> = {
+    'groundnut-oil': '/images/Oilimages/groundnutoil.png',
+    'coconut-oil': '/images/Oilimages/cocunutoil.png',
+    'sesame-oil': '/images/Oilimages/sesameoil.png',
+    'castor-oil': '/images/Oilimages/castoroil.png',
+    'deepam-oil': '/images/Oilimages/deepamoil.png',
+  };
+  const imageUrl = productImageMap[slug] || '/images/Oilimages/groundnutoil.png';
+
   return (
     <main className="flex-1 bg-surface py-12">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -39,10 +48,10 @@ export default async function ProductDetailPage({ params }: { params: Promise<{ 
         </nav>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20">
-          {/* Image/Animation Column */}
+          {/* Image Column */}
           <div className="bg-white rounded-3xl p-8 lg:p-12 shadow-sm border border-neutral-100 flex items-center justify-center min-h-[400px]">
-             <div className="w-full max-w-sm">
-                <OilPourHeroSVG />
+             <div className="w-full max-w-sm aspect-square relative rounded-full overflow-hidden border-[12px] border-neutral-50 shadow-inner bg-neutral-100">
+                <Image src={imageUrl} alt={product.name} fill className="object-cover p-2" />
              </div>
           </div>
 

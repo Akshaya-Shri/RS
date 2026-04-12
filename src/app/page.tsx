@@ -1,14 +1,14 @@
 import OilPourHeroSVG from '@/components/ui/OilPourHeroSVG';
-import CategoryIcons from '@/components/ui/CategoryIcons';
+import Image from 'next/image';
 import Link from 'next/link';
 
 export default function Home() {
   const categories = [
-    { name: 'Groundnut Oil', type: 'groundnut' as const, slug: 'groundnut', color: 'bg-orange-50' },
-    { name: 'Coconut Oil', type: 'coconut' as const, slug: 'coconut', color: 'bg-amber-50' },
-    { name: 'Sesame Oil', type: 'sesame' as const, slug: 'sesame', color: 'bg-green-50' },
-    { name: 'Castor Oil', type: 'castor' as const, slug: 'castor', color: 'bg-purple-50' },
-    { name: 'Deepam Oil', type: 'deepam' as const, slug: 'deepam', color: 'bg-red-50' },
+    { name: 'Groundnut Oil', type: 'groundnut' as const, slug: 'groundnut', color: 'bg-orange-50', imageUrl: '/images/Oilimages/groundnutoil.png' },
+    { name: 'Coconut Oil', type: 'coconut' as const, slug: 'coconut', color: 'bg-amber-50', imageUrl: '/images/Oilimages/cocunutoil.png' },
+    { name: 'Sesame Oil', type: 'sesame' as const, slug: 'sesame', color: 'bg-green-50', imageUrl: '/images/Oilimages/sesameoil.png' },
+    { name: 'Castor Oil', type: 'castor' as const, slug: 'castor', color: 'bg-purple-50', imageUrl: '/images/Oilimages/castoroil.png' },
+    { name: 'Deepam Oil', type: 'deepam' as const, slug: 'deepam', color: 'bg-red-50', imageUrl: '/images/Oilimages/deepamoil.png' },
   ];
 
   const features = [
@@ -91,9 +91,9 @@ export default function Home() {
           <div className="grid grid-cols-2 lg:grid-cols-5 gap-6">
             {categories.map((cat) => (
               <Link key={cat.slug} href={`/products?category=${cat.slug}`} className="group flex flex-col items-center lift-effect">
-                <div className={`w-32 h-32 rounded-full ${cat.color} border-4 border-white shadow-md flex items-center justify-center p-6 relative overflow-hidden`}>
-                   <div className="absolute inset-0 bg-secondary/10 opacity-0 group-hover:opacity-100 transition-opacity" />
-                   <CategoryIcons type={cat.type} />
+                <div className={`w-32 h-32 rounded-full ${cat.color} border-4 border-white shadow-md flex items-center justify-center relative overflow-hidden`}>
+                   <div className="absolute inset-0 bg-secondary/10 opacity-0 group-hover:opacity-100 transition-opacity z-10" />
+                   <Image src={cat.imageUrl} alt={cat.name} fill className="object-cover p-2" />
                 </div>
                 <h3 className="mt-4 font-bold text-foreground group-hover:text-primary transition-colors">{cat.name}</h3>
               </Link>
