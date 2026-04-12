@@ -36,7 +36,9 @@ export default function ContactPage() {
                  </div>
                  <div>
                     <h3 className="text-xl font-bold text-foreground mb-2">Call Us</h3>
-                    <p className="text-neutral-600 font-inter mb-1">+91 90000 00000</p>
+                    <p className="text-neutral-600 font-inter mb-1"><strong>Phone:</strong> +91 92454 83536</p>
+                    <p className="text-neutral-600 font-inter mb-1"><strong>Alternate:</strong> +91 92450 31931</p>
+                    <p className="text-neutral-600 font-inter mb-2"><strong>Email:</strong> shanmugaveloilmill@gmail.com</p>
                     <p className="text-sm text-neutral-500 font-inter">Mon-Sat, 9AM to 8PM</p>
                  </div>
               </div>
