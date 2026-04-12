@@ -3,19 +3,108 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { useCart } from '@/components/cart/CartProvider';
+import { useRouter } from 'next/navigation';
+import { useCart, CartItem } from '@/components/cart/CartProvider';
 
 export default function CheckoutPage() {
   const [paymentStep, setPaymentStep] = useState(false);
   const [file, setFile] = useState<File | null>(null);
   const [mounted, setMounted] = useState(false);
-  const { total } = useCart();
+  const [loading, setLoading] = useState(false);
+  const [formData, setFormData] = useState({
+    name: '',
+    phone: '',
+    email: '',
+    address: '',
+    city: '',
+    state: 'Tamil Nadu',
+    pincode: '',
+    transactionId: ''
+  });
+  const { total, cartItems, clearCart } = useCart();
+  const router = useRouter();
 
   useEffect(() => {
     setMounted(true);
   }, []);
 
   if (!mounted) return null;
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    setFormData({
+      ...formData,
+      [e.target.name]: e.target.value
+    });
+  };
+
+  const handleOrderSubmit = async () => {
+    if (!file || !formData.transactionId) {
+      alert('Please upload payment screenshot and enter transaction ID');
+      return;
+    }
+
+    setLoading(true);
+
+    try {
+      // First upload the payment image
+      const formDataUpload = new FormData();
+      formDataUpload.append('file', file);
+      formDataUpload.append('isPayment', 'true');
+
+      const uploadRes = await fetch('/api/admin/upload', {
+        method: 'POST',
+        body: formDataUpload
+      });
+
+      const uploadJson = await uploadRes.json();
+      if (!uploadJson.success) {
+        throw new Error('Failed to upload payment proof');
+      }
+
+      // Prepare order data
+      const orderData = {
+        customer_name: formData.name,
+        customer_phone: formData.phone,
+        customer_email: formData.email || null,
+        address: formData.address,
+        city: formData.city,
+        state: formData.state,
+        pincode: formData.pincode,
+        transaction_id: formData.transactionId,
+        payment_img_url: uploadJson.url,
+        total_amount: total,
+        items: cartItems.map((item: CartItem) => ({
+          product_id: item.product_id || 1, // Default to first product if not set
+          size: item.size,
+          quantity: item.qty,
+          price: item.price
+        }))
+      };
+
+      // Create order
+      const orderRes = await fetch('/api/orders', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(orderData)
+      });
+
+      const orderJson = await orderRes.json();
+      if (!orderJson.success) {
+        throw new Error(orderJson.message || 'Failed to create order');
+      }
+
+      // Clear cart and redirect
+      clearCart();
+      alert(`Order placed successfully! Order ID: #ORD-${orderJson.data.orderId.toString().padStart(4, '0')}\n\nWe will verify the payment and update the status soon.`);
+      router.push('/');
+
+    } catch (error) {
+      console.error('Order submission error:', error);
+      alert('Failed to place order. Please try again.');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <main className="flex-1 bg-surface py-12 md:py-20">
@@ -38,31 +127,84 @@ export default function CheckoutPage() {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                    <div>
                      <label className="block text-sm font-bold text-foreground mb-2">Full Name</label>
-                     <input type="text" className="w-full px-4 py-3 rounded-xl border border-neutral-300 focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all" required />
+                     <input
+                       type="text"
+                       name="name"
+                       value={formData.name}
+                       onChange={handleInputChange}
+                       className="w-full px-4 py-3 rounded-xl border border-neutral-300 focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all"
+                       required
+                     />
                    </div>
                    <div>
                      <label className="block text-sm font-bold text-foreground mb-2">Phone Number</label>
-                     <input type="tel" className="w-full px-4 py-3 rounded-xl border border-neutral-300 focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all" required />
+                     <input
+                       type="tel"
+                       name="phone"
+                       value={formData.phone}
+                       onChange={handleInputChange}
+                       className="w-full px-4 py-3 rounded-xl border border-neutral-300 focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all"
+                       required
+                     />
                    </div>
                 </div>
-                
+
+                <div>
+                   <label className="block text-sm font-bold text-foreground mb-2">Email (Optional)</label>
+                   <input
+                     type="email"
+                     name="email"
+                     value={formData.email}
+                     onChange={handleInputChange}
+                     className="w-full px-4 py-3 rounded-xl border border-neutral-300 focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all"
+                   />
+                </div>
+
                 <div>
                    <label className="block text-sm font-bold text-foreground mb-2">Complete Address</label>
-                   <textarea rows={3} className="w-full px-4 py-3 rounded-xl border border-neutral-300 focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all resize-none" required></textarea>
+                   <textarea
+                     rows={3}
+                     name="address"
+                     value={formData.address}
+                     onChange={handleInputChange}
+                     className="w-full px-4 py-3 rounded-xl border border-neutral-300 focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all resize-none"
+                     required
+                   ></textarea>
                 </div>
 
                 <div className="grid grid-cols-2 md:grid-cols-3 gap-6">
                    <div>
                      <label className="block text-sm font-bold text-foreground mb-2">City</label>
-                     <input type="text" className="w-full px-4 py-3 rounded-xl border border-neutral-300 focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all" required />
+                     <input
+                       type="text"
+                       name="city"
+                       value={formData.city}
+                       onChange={handleInputChange}
+                       className="w-full px-4 py-3 rounded-xl border border-neutral-300 focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all"
+                       required
+                     />
                    </div>
                    <div>
                      <label className="block text-sm font-bold text-foreground mb-2">State</label>
-                     <input type="text" className="w-full px-4 py-3 rounded-xl border border-neutral-300 focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all" defaultValue="Tamil Nadu" required />
+                     <input
+                       type="text"
+                       name="state"
+                       value={formData.state}
+                       onChange={handleInputChange}
+                       className="w-full px-4 py-3 rounded-xl border border-neutral-300 focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all"
+                       required
+                     />
                    </div>
                    <div className="col-span-2 md:col-span-1">
                      <label className="block text-sm font-bold text-foreground mb-2">PIN Code</label>
-                     <input type="text" className="w-full px-4 py-3 rounded-xl border border-neutral-300 focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all" required />
+                     <input
+                       type="text"
+                       name="pincode"
+                       value={formData.pincode}
+                       onChange={handleInputChange}
+                       className="w-full px-4 py-3 rounded-xl border border-neutral-300 focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all"
+                       required
+                     />
                    </div>
                 </div>
 
@@ -112,17 +254,20 @@ export default function CheckoutPage() {
 
                    <div>
                      <label className="block text-sm font-bold text-foreground mb-2">UPI Transaction ID (12 Digits)</label>
-                     <input 
-                       type="text" 
+                     <input
+                       type="text"
+                       name="transactionId"
+                       value={formData.transactionId}
+                       onChange={handleInputChange}
                        inputMode="numeric"
                        pattern="[0-9]*"
                        maxLength={12}
                        onInput={(e) => {
                          e.currentTarget.value = e.currentTarget.value.replace(/[^0-9]/g, '');
                        }}
-                       className="w-full px-4 py-3 rounded-xl border border-neutral-300 focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all" 
-                       placeholder="e.g. 301234567890" 
-                       required 
+                       className="w-full px-4 py-3 rounded-xl border border-neutral-300 focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all"
+                       placeholder="e.g. 301234567890"
+                       required
                      />
                    </div>
 
@@ -152,8 +297,13 @@ export default function CheckoutPage() {
 
              <div className="pt-8 flex justify-between items-center border-t border-neutral-100">
                 <button type="button" onClick={() => setPaymentStep(false)} className="text-neutral-500 font-bold hover:text-primary transition-colors">Back</button>
-                <button type="button" onClick={() => alert("Order Placed Successfully! We will verify the payment and confirm shortly.")} className="px-8 py-4 bg-secondary text-white font-bold rounded-xl hover:bg-secondary/90 transition-all shadow-lg hover:shadow-secondary/30 glow-effect active:scale-95">
-                   Confirm Order
+                <button
+                  type="button"
+                  onClick={handleOrderSubmit}
+                  disabled={loading}
+                  className="px-8 py-4 bg-secondary text-white font-bold rounded-xl hover:bg-secondary/90 transition-all shadow-lg hover:shadow-secondary/30 glow-effect active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {loading ? 'Processing Order...' : 'Confirm Order'}
                 </button>
              </div>
           </div>

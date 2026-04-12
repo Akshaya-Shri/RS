@@ -28,6 +28,8 @@ export default async function ProductDetailPage({ params }: { params: Promise<{ 
 
   const imageUrl = product.imageUrl || '/images/Oilimages/groundnutoil.png';
 
+  const isAvailable = product.available !== false;
+
   return (
     <main className="flex-1 bg-surface py-12">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -51,7 +53,12 @@ export default async function ProductDetailPage({ params }: { params: Promise<{ 
 
           {/* Details Column */}
           <div className="flex flex-col">
-            <h1 className="text-3xl md:text-5xl font-bold text-foreground mb-4">{product.name}</h1>
+            <div className="flex flex-wrap items-center gap-3 mb-4">
+              <h1 className="text-3xl md:text-5xl font-bold text-foreground">{product.name}</h1>
+              <span className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-semibold ${isAvailable ? 'bg-emerald-100 text-emerald-600' : 'bg-red-100 text-red-600'}`}>
+                {isAvailable ? 'In Stock' : 'Out of Stock'}
+              </span>
+            </div>
             <p className="text-neutral-600 font-inter leading-relaxed mb-8">{product.description}</p>
             
             {/* Interactive Add To Cart Box */}
@@ -60,7 +67,8 @@ export default async function ProductDetailPage({ params }: { params: Promise<{ 
               name: product.name,
               image: imageUrl,
               pricePerLiter: product.price,
-              sizes: product.sizes
+              sizes: product.sizes,
+              available: isAvailable
             }} />
 
             {/* Benefits & Usage Accordion */}

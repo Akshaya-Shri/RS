@@ -20,7 +20,8 @@
       "No chemical refining or bleaching",
       "Source of Vitamin E"
     ],
-    "usage": "Suitable for high-heat cooking and raw consumption."
+    "usage": "Suitable for high-heat cooking and raw consumption.",
+    "available": false
   },
   {
     "id": 2,

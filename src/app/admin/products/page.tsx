@@ -12,10 +12,14 @@ export default function AdminProductsPage() {
   const [formName, setFormName] = useState("");
   const [formPrice, setFormPrice] = useState("");
   const [formFile, setFormFile] = useState<File | null>(null);
+  const [formSizes, setFormSizes] = useState("100ml, 500ml, 1L");
+  const [formAvailable, setFormAvailable] = useState(true);
 
   const [isAdding, setIsAdding] = useState(false);
   const [newCat, setNewCat] = useState("groundnut");
   const [newSlug, setNewSlug] = useState("");
+  const [newSizes, setNewSizes] = useState("100ml, 500ml, 1L");
+  const [newAvailable, setNewAvailable] = useState(true);
 
   const fetchProducts = async () => {
     setLoading(true);
@@ -37,6 +41,8 @@ export default function AdminProductsPage() {
     setEditingId(p.id);
     setFormName(p.name);
     setFormPrice(p.price.toString());
+    setFormSizes(Array.isArray(p.sizes) ? p.sizes.join(', ') : '100ml, 500ml, 1L');
+    setFormAvailable(p.available !== undefined ? Boolean(p.available) : true);
     setFormFile(null);
   };
 
@@ -60,7 +66,9 @@ export default function AdminProductsPage() {
     const payload: any = {
       id,
       name: formName,
-      price: parseInt(formPrice) || 0
+      price: parseInt(formPrice) || 0,
+      sizes: formSizes.split(',').map((s) => s.trim()).filter(Boolean),
+      available: formAvailable,
     };
     if (newImageUrl) payload.imageUrl = newImageUrl;
 
@@ -78,8 +86,8 @@ export default function AdminProductsPage() {
   };
 
   const handleAddNewProduct = async () => {
-    if (!formFile || !formName || !formPrice || !newSlug) {
-      alert("Please fill all fields and upload an image!");
+    if (!formFile || !formName || !formPrice || !newSlug || !newSizes) {
+      alert("Please fill all fields, include sizes, and upload an image!");
       return;
     }
 
@@ -95,13 +103,16 @@ export default function AdminProductsPage() {
     }
 
     // 2. Add to DB
+    const parsedSizes = newSizes.split(',').map((s) => s.trim()).filter(Boolean);
+
     const payload = {
       name: formName,
       price: parseInt(formPrice) || 0,
       category: newCat,
       slug: newSlug,
       imageUrl: uploadJson.url,
-      sizes: ["100ml", "500ml", "1L"],
+      sizes: parsedSizes.length ? parsedSizes : ["100ml", "500ml", "1L"],
+      available: newAvailable,
       description: "Admin added description",
       benefits: [],
       usage: "Admin added usage"
@@ -145,6 +156,20 @@ export default function AdminProductsPage() {
                  <input type="number" value={formPrice} onChange={e => setFormPrice(e.target.value)} className="w-full border p-2 rounded-lg" />
                </div>
                <div>
+                 <label className="block text-sm text-neutral-500 mb-1">Available Sizes</label>
+                 <input type="text" value={newSizes} onChange={e => setNewSizes(e.target.value)} className="w-full border p-2 rounded-lg" placeholder="100ml, 250ml, 500ml, 1L" />
+                 <p className="text-xs text-neutral-500 mt-1">Enter sizes separated by commas.</p>
+               </div>
+               <div>
+                 <label className="block text-sm text-neutral-500 mb-1">Availability</label>
+                 <div className="flex items-center gap-3">
+                   <label className="flex items-center gap-2 text-sm text-neutral-600">
+                     <input type="checkbox" checked={newAvailable} onChange={e => setNewAvailable(e.target.checked)} className="h-4 w-4 rounded border-neutral-300" />
+                     In stock / available
+                   </label>
+                 </div>
+               </div>
+               <div>
                  <label className="block text-sm text-neutral-500 mb-1">Category / Type</label>
                  <input type="text" value={newCat} onChange={e => setNewCat(e.target.value)} className="w-full border p-2 rounded-lg capitalize" />
                </div>
@@ -182,6 +207,18 @@ export default function AdminProductsPage() {
                      <input type="number" value={formPrice} onChange={e => setFormPrice(e.target.value)} className="w-full border border-neutral-300 p-2 rounded-lg focus:outline-none focus:ring-1 focus:ring-primary" />
                    </div>
                    <div>
+                     <label className="block text-xs font-bold text-neutral-500 uppercase mb-1">Sizes</label>
+                     <input type="text" value={formSizes} onChange={e => setFormSizes(e.target.value)} className="w-full border border-neutral-300 p-2 rounded-lg focus:outline-none focus:ring-1 focus:ring-primary" placeholder="100ml, 250ml, 500ml, 1L" />
+                     <p className="text-xs text-neutral-500 mt-1">Enter sizes separated by commas.</p>
+                   </div>
+                   <div>
+                     <label className="block text-xs font-bold text-neutral-500 uppercase mb-1">Availability</label>
+                     <label className="flex items-center gap-2 text-sm text-neutral-600">
+                       <input type="checkbox" checked={formAvailable} onChange={e => setFormAvailable(e.target.checked)} className="h-4 w-4 rounded border-neutral-300" />
+                       In stock / available
+                     </label>
+                   </div>
+                   <div>
                      <label className="block text-xs font-bold text-neutral-500 uppercase mb-1">Update Photo</label>
                      <input type="file" accept="image/*" onChange={e => setFormFile(e.target.files?.[0] || null)} className="text-sm" />
                    </div>
@@ -196,9 +233,14 @@ export default function AdminProductsPage() {
                      <Image src={product.imageUrl} alt={product.name} fill className="object-contain p-4 group-hover:scale-110 transition-transform duration-500" />
                    </div>
                    <div>
-                     <div className="flex justify-between items-start mb-1">
+                     <div className="flex flex-wrap justify-between items-start mb-1 gap-2">
                         <h3 className="font-bold text-foreground text-lg leading-tight">{product.name}</h3>
-                        <span className="px-2 py-1 bg-neutral-100 text-neutral-500 text-xs rounded uppercase font-bold tracking-widest">{product.category}</span>
+                        <div className="flex items-center gap-2">
+                          <span className="px-2 py-1 bg-neutral-100 text-neutral-500 text-xs rounded uppercase font-bold tracking-widest">{product.category}</span>
+                          <span className={`px-2 py-1 text-xs font-bold rounded uppercase tracking-widest ${product.available === false ? 'bg-red-100 text-red-600' : 'bg-emerald-100 text-emerald-600'}`}>
+                            {product.available === false ? 'Unavailable' : 'Available'}
+                          </span>
+                        </div>
                      </div>
                      <p className="text-xl font-extrabold text-secondary mt-2 mb-4">₹{product.price} <span className="text-sm text-neutral-400 font-normal">/ 1L</span></p>
                      <button onClick={() => handleEditClick(product)} className="w-full py-2 bg-primary/10 text-primary font-bold rounded-lg hover:bg-primary/20 transition-colors">

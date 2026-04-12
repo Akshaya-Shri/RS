@@ -16,6 +16,9 @@ export default function AdminLayout({
           <a href="/admin" className="px-4 py-3 rounded-lg text-neutral-600 font-medium hover:bg-neutral-50 hover:text-primary transition-colors">
             Dashboard Overview
           </a>
+          <a href="/admin/orders" className="px-4 py-3 rounded-lg text-neutral-600 font-medium hover:bg-neutral-50 hover:text-primary transition-colors">
+            Manage Orders
+          </a>
           <a href="/admin/products" className="px-4 py-3 rounded-lg text-neutral-600 font-medium hover:bg-neutral-50 hover:text-primary transition-colors">
             Manage Products
           </a>
@@ -44,6 +47,7 @@ export default function AdminLayout({
          {/* Mobile Nav Header */}
          <div className="md:hidden bg-white border-b border-neutral-200 p-4 mb-4 flex gap-4 overflow-x-auto items-center">
             <a href="/admin" className="px-4 py-2 bg-neutral-100 rounded-full whitespace-nowrap font-bold text-sm">Overview</a>
+            <a href="/admin/orders" className="px-4 py-2 bg-neutral-100 rounded-full whitespace-nowrap font-bold text-sm">Orders</a>
             <a href="/admin/products" className="px-4 py-2 bg-neutral-100 rounded-full whitespace-nowrap font-bold text-sm">Products</a>
             <a href="/admin/settings" className="px-4 py-2 bg-neutral-100 rounded-full whitespace-nowrap font-bold text-sm">Settings</a>
             <button 

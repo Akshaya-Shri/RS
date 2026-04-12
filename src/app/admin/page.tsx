@@ -1,12 +1,45 @@
+"use client";
+
 import AnimatedCounter from "@/components/ui/AnimatedCounter";
+import { useState, useEffect } from 'react';
 
 export default function AdminDashboard() {
-  const stats = [
-    { title: "Total Orders", value: 1284, color: "bg-blue-50 text-blue-600 dot-blue-500" },
-    { title: "Revenue (₹)", value: 450200, color: "bg-green-50 text-green-600 dot-green-500" },
-    { title: "Products", value: 24, color: "bg-orange-50 text-orange-600 dot-orange-500" },
-    { title: "Pending Approvals", value: 12, color: "bg-red-50 text-red-600 dot-red-500" }
-  ];
+  const [stats, setStats] = useState([
+    { title: "Total Orders", value: 0, color: "bg-blue-50 text-blue-600 dot-blue-500" },
+    { title: "Revenue (₹)", value: 0, color: "bg-green-50 text-green-600 dot-green-500" },
+    { title: "Products", value: 5, color: "bg-orange-50 text-orange-600 dot-orange-500" },
+    { title: "Pending Approvals", value: 0, color: "bg-red-50 text-red-600 dot-red-500" }
+  ]);
+  const [recentOrders, setRecentOrders] = useState<any[]>([]);
+
+  useEffect(() => {
+    const fetchStats = async () => {
+      try {
+        const res = await fetch('/api/admin/orders');
+        const json = await res.json();
+        if (json.success) {
+          const orders = json.data;
+          const totalOrders = orders.length;
+          const revenue = orders.reduce((sum: number, order: any) => sum + (order.total_amount || 0), 0);
+          const pendingApprovals = orders.filter((order: any) => order.status === 'pending').length;
+
+          setStats([
+            { title: "Total Orders", value: totalOrders, color: "bg-blue-50 text-blue-600 dot-blue-500" },
+            { title: "Revenue (₹)", value: revenue, color: "bg-green-50 text-green-600 dot-green-500" },
+            { title: "Products", value: 5, color: "bg-orange-50 text-orange-600 dot-orange-500" },
+            { title: "Pending Approvals", value: pendingApprovals, color: "bg-red-50 text-red-600 dot-red-500" }
+          ]);
+
+          // Set recent orders (last 4)
+          setRecentOrders(orders.slice(0, 4));
+        }
+      } catch (e) {
+        console.error('Failed to fetch stats:', e);
+      }
+    };
+
+    fetchStats();
+  }, []);
 
   return (
     <main className="p-6 md:p-10 flex-1 overflow-y-auto bg-neutral-50">
@@ -30,37 +63,54 @@ export default function AdminDashboard() {
       </div>
 
       <div className="bg-white p-6 rounded-2xl shadow-sm border border-neutral-100">
-        <h3 className="text-lg font-bold mb-6 text-foreground">Recent Orders</h3>
-        <div className="overflow-x-auto">
-           <table className="w-full text-left">
+        <div className="flex justify-between items-center mb-6">
+          <h3 className="text-lg font-bold text-foreground">Recent Orders</h3>
+          <a href="/admin/orders" className="text-primary font-bold hover:underline">View All</a>
+        </div>
+        {recentOrders.length === 0 ? (
+          <div className="text-center py-12">
+            <div className="text-neutral-400 mb-4">
+              <svg className="w-16 h-16 mx-auto mb-4 opacity-50" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+              </svg>
+            </div>
+            <h4 className="text-lg font-semibold text-neutral-600 mb-2">No orders yet</h4>
+            <p className="text-neutral-500">Orders will appear here once customers start placing them.</p>
+          </div>
+        ) : (
+          <div className="overflow-x-auto">
+            <table className="w-full text-left">
               <thead>
-                 <tr className="border-b border-neutral-200 text-neutral-500 text-sm">
-                    <th className="pb-4 font-medium">Order ID</th>
-                    <th className="pb-4 font-medium">Customer</th>
-                    <th className="pb-4 font-medium">Amount</th>
-                    <th className="pb-4 font-medium">Status</th>
-                    <th className="pb-4 font-medium text-right">Action</th>
-                 </tr>
+                <tr className="border-b border-neutral-200 text-neutral-500 text-sm">
+                  <th className="pb-4 font-medium">Order ID</th>
+                  <th className="pb-4 font-medium">Customer</th>
+                  <th className="pb-4 font-medium">Amount</th>
+                  <th className="pb-4 font-medium">Status</th>
+                </tr>
               </thead>
               <tbody className="text-sm">
-                 {[1, 2, 3, 4].map(row => (
-                    <tr key={row} className="border-b border-neutral-100 hover:bg-neutral-50 transition-colors">
-                       <td className="py-5 font-bold text-foreground">#ORD-20260{row}</td>
-                       <td className="py-5 text-neutral-600">Shanmugam {row}</td>
-                       <td className="py-5 font-bold">₹{620 * row}</td>
-                       <td className="py-5">
-                          <span className={`px-3 py-1.5 text-xs rounded-full font-bold ${row === 1 ? 'bg-amber-100 text-amber-700' : 'bg-green-100 text-green-700'}`}>
-                             {row === 1 ? 'Pending Verification' : 'Verified'}
-                          </span>
-                       </td>
-                       <td className="py-5 text-right">
-                          <button className="text-primary font-bold hover:underline">View Details</button>
-                       </td>
-                    </tr>
-                 ))}
+                {recentOrders.map((order) => (
+                  <tr key={order.id} className="border-b border-neutral-100 hover:bg-neutral-50 transition-colors">
+                    <td className="py-4 font-bold text-foreground">#ORD-{order.id.toString().padStart(4, '0')}</td>
+                    <td className="py-4 text-neutral-600">{order.customer_name || 'Walk-in Customer'}</td>
+                    <td className="py-4 font-bold">₹{order.total_amount}</td>
+                    <td className="py-4">
+                      <span className={`px-2 py-1 text-xs rounded-full font-bold ${
+                        order.status === 'pending' ? 'bg-amber-100 text-amber-700' :
+                        order.status === 'verified' ? 'bg-blue-100 text-blue-700' :
+                        order.status === 'shipped' ? 'bg-purple-100 text-purple-700' :
+                        order.status === 'delivered' ? 'bg-green-100 text-green-700' :
+                        'bg-red-100 text-red-700'
+                      }`}>
+                        {order.status}
+                      </span>
+                    </td>
+                  </tr>
+                ))}
               </tbody>
-           </table>
-        </div>
+            </table>
+          </div>
+        )}
       </div>
     </main>
   );

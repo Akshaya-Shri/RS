@@ -10,6 +10,7 @@ export type CartItem = {
   image: string;
   qty: number;
   slug: string;
+  product_id?: number;
 };
 
 interface CartContextType {
@@ -17,6 +18,7 @@ interface CartContextType {
   addItem: (item: CartItem) => void;
   removeItem: (id: string) => void;
   updateQuantity: (id: string, delta: number) => void;
+  clearCart: () => void;
   subtotal: number;
   shipping: number;
   total: number;
@@ -80,13 +82,17 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     }));
   };
 
+  const clearCart = () => {
+    setCartItems([]);
+  };
+
   const safeItems = Array.isArray(cartItems) ? cartItems : [];
   const subtotal = safeItems.reduce((total, item) => total + (item.price * item.qty), 0);
   const shipping = safeItems.length > 0 ? 50 : 0;
   const total = subtotal + shipping;
 
   return (
-    <CartContext.Provider value={{ cartItems, addItem, removeItem, updateQuantity, subtotal, shipping, total }}>
+    <CartContext.Provider value={{ cartItems, addItem, removeItem, updateQuantity, clearCart, subtotal, shipping, total }}>
       {children}
     </CartContext.Provider>
   );
