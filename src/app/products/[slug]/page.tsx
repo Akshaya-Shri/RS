@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import Image from 'next/image';
+import AddToCartSection from '@/components/ui/AddToCartSection';
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
@@ -58,36 +59,16 @@ export default async function ProductDetailPage({ params }: { params: Promise<{ 
           {/* Details Column */}
           <div className="flex flex-col">
             <h1 className="text-3xl md:text-5xl font-bold text-foreground mb-4">{product.name}</h1>
-            <p className="text-2xl font-bold text-secondary mb-6">₹{product.price} <span className="text-base text-neutral-500 font-normal">/ 1L</span></p>
-            
             <p className="text-neutral-600 font-inter leading-relaxed mb-8">{product.description}</p>
             
-            {/* Size Selector */}
-            <div className="mb-8">
-              <h3 className="font-bold text-foreground mb-3">Select Size</h3>
-              <div className="flex flex-wrap gap-3">
-                {product.sizes.map((size, index) => (
-                  <button key={size} className={`px-4 py-2 rounded-lg border font-medium transition-colors ${index === 2 ? 'border-primary bg-primary/5 text-primary' : 'border-neutral-200 text-neutral-600 hover:border-primary-light'}`}>
-                    {size}
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            {/* Quantity & Add to Cart */}
-            <div className="flex items-center gap-4 mb-10">
-              <div className="flex items-center border border-neutral-200 rounded-lg overflow-hidden h-14 bg-white">
-                <button className="px-4 text-neutral-500 hover:bg-neutral-50 hover:text-primary transition-colors h-full">-</button>
-                <div className="w-12 text-center font-bold">1</div>
-                <button className="px-4 text-neutral-500 hover:bg-neutral-50 hover:text-primary transition-colors h-full">+</button>
-              </div>
-              <button className="flex-1 h-14 bg-primary text-white font-bold rounded-lg hover:bg-primary/90 transition-all flex items-center justify-center gap-2 lift-effect shadow-md shadow-primary/20">
-                 <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
-                 </svg>
-                 Add to Cart
-              </button>
-            </div>
+            {/* Interactive Add To Cart Box */}
+            <AddToCartSection product={{
+              slug: slug,
+              name: product.name,
+              image: imageUrl,
+              pricePerLiter: product.price,
+              sizes: product.sizes
+            }} />
 
             {/* Benefits & Usage Accordion */}
             <div className="space-y-6 pt-8 border-t border-neutral-100">

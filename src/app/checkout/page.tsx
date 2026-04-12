@@ -1,11 +1,20 @@
 "use client";
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { useCart } from '@/components/cart/CartProvider';
 
 export default function CheckoutPage() {
   const [paymentStep, setPaymentStep] = useState(false);
   const [file, setFile] = useState<File | null>(null);
+  const [mounted, setMounted] = useState(false);
+  const { total } = useCart();
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  if (!mounted) return null;
 
   return (
     <main className="flex-1 bg-surface py-12 md:py-20">
@@ -69,7 +78,7 @@ export default function CheckoutPage() {
           <div className="bg-white p-8 md:p-12 rounded-3xl shadow-sm border border-neutral-100">
              <div className="text-center mb-10">
                 <h2 className="text-3xl font-bold text-primary mb-2">Scan & Pay</h2>
-                <p className="text-neutral-600 font-inter">Total Amount to Pay: <strong className="text-secondary text-xl">₹620.00</strong></p>
+                <p className="text-neutral-600 font-inter">Total Amount to Pay: <strong className="text-secondary text-xl">₹{total.toFixed(2)}</strong></p>
              </div>
 
              <div className="flex flex-col md:flex-row gap-12 items-center justify-center mb-12">
@@ -113,7 +122,7 @@ export default function CheckoutPage() {
                       </h3>
                       <ol className="list-decimal list-inside text-sm text-neutral-700 space-y-2 font-inter">
                          <li>Scan the QR code using any UPI app.</li>
-                         <li>Pay the exact amount of <strong>₹620.00</strong>.</li>
+                         <li>Pay the exact amount of <strong>₹{total.toFixed(2)}</strong>.</li>
                          <li>Take a screenshot of the successful payment.</li>
                          <li>Enter the UPI Transaction ID below and upload the screenshot.</li>
                       </ol>
@@ -121,7 +130,18 @@ export default function CheckoutPage() {
 
                    <div>
                      <label className="block text-sm font-bold text-foreground mb-2">UPI Transaction ID (12 Digits)</label>
-                     <input type="text" className="w-full px-4 py-3 rounded-xl border border-neutral-300 focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all" placeholder="e.g. 301234567890" required />
+                     <input 
+                       type="text" 
+                       inputMode="numeric"
+                       pattern="[0-9]*"
+                       maxLength={12}
+                       onInput={(e) => {
+                         e.currentTarget.value = e.currentTarget.value.replace(/[^0-9]/g, '');
+                       }}
+                       className="w-full px-4 py-3 rounded-xl border border-neutral-300 focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all" 
+                       placeholder="e.g. 301234567890" 
+                       required 
+                     />
                    </div>
 
                    <div>
