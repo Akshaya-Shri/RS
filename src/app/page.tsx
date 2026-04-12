@@ -1,65 +1,148 @@
-import Image from "next/image";
+import OilPourHeroSVG from '@/components/ui/OilPourHeroSVG';
+import CategoryIcons from '@/components/ui/CategoryIcons';
+import Link from 'next/link';
 
 export default function Home() {
+  const categories = [
+    { name: 'Groundnut Oil', type: 'groundnut' as const, slug: 'groundnut', color: 'bg-orange-50' },
+    { name: 'Coconut Oil', type: 'coconut' as const, slug: 'coconut', color: 'bg-amber-50' },
+    { name: 'Sesame Oil', type: 'sesame' as const, slug: 'sesame', color: 'bg-green-50' },
+    { name: 'Castor Oil', type: 'castor' as const, slug: 'castor', color: 'bg-purple-50' },
+    { name: 'Deepam Oil', type: 'deepam' as const, slug: 'deepam', color: 'bg-red-50' },
+  ];
+
+  const features = [
+    { 
+      title: 'Pure Extraction', 
+      desc: 'Traditional wooden press (chekku) extraction retaining maximum nutrients.',
+      icon: (
+        <svg viewBox="0 0 24 24" className="w-12 h-12 text-primary" fill="none" stroke="currentColor" strokeWidth="2">
+          <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" strokeLinecap="round" strokeLinejoin="round"/>
+        </svg>
+      )
+    },
+    { 
+      title: 'Direct From Mill', 
+      desc: 'No middlemen. Directly sourced from our Theni facility since 1975.',
+      icon: (
+        <svg viewBox="0 0 24 24" className="w-12 h-12 text-secondary" fill="none" stroke="currentColor" strokeWidth="2">
+          <path d="M3 21h18M3 7v1a3 3 0 0 0 6 0v-1m0 1a3 3 0 0 0 6 0v-1m0 1a3 3 0 0 0 6 0v-1h-18l2-4h14l2 4M5 21V10.85M19 21V10.85M9 21v-4a2 2 0 0 1 4 0v4"/>
+        </svg>
+      )
+    },
+    { 
+      title: 'MSME Certified', 
+      desc: 'Government recognized quality standard and authentic manufacturing.',
+      icon: (
+        <svg viewBox="0 0 24 24" className="w-12 h-12 text-primary-light" fill="none" stroke="currentColor" strokeWidth="2">
+          <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" strokeLinecap="round" strokeLinejoin="round"/>
+        </svg>
+      )
+    }
+  ];
+
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
+    <main className="flex-1">
+      {/* Hero Section */}
+      <section className="relative overflow-hidden bg-surface py-20 lg:py-32 border-b border-primary-light/20">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+            <div className="space-y-8">
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 text-primary text-sm font-bold tracking-wide">
+                <span className="w-2 h-2 rounded-full bg-primary animate-ping" />
+                Since 1975
+              </div>
+              <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold text-foreground leading-tight">
+                From our own <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-secondary">oil mill</span> to your home.
+              </h1>
+              <p className="text-xl text-neutral-600 font-inter">
+                Experience the tradition and purity of cold-pressed oils. Authentic, nutritious, and straight from the source.
+              </p>
+              <div className="flex flex-wrap gap-4 pt-4">
+                <Link href="/products" className="px-8 py-4 bg-primary text-white font-bold rounded-lg hover:bg-primary/90 transition-colors shadow-lg shadow-primary/30 flex items-center gap-2 group">
+                  Shop Now
+                  <svg className="w-5 h-5 group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                  </svg>
+                </Link>
+                <Link href="/wholesale" className="px-8 py-4 bg-white text-primary border-2 border-primary font-bold rounded-lg hover:bg-neutral-50 transition-colors">
+                  Wholesale Inquiry
+                </Link>
+              </div>
+            </div>
+            
+            <div className="relative h-[400px] lg:h-[600px] flex items-center justify-center">
+               <OilPourHeroSVG className="max-w-md" />
+            </div>
+          </div>
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
+        {/* Background Decorative Pattern */}
+        <div className="absolute inset-0 z-0 opacity-[0.03] pointer-events-none" style={{ backgroundImage: 'radial-gradient(#1B5E20 2px, transparent 2px)', backgroundSize: '30px 30px' }}></div>
+      </section>
+
+      {/* Categories Section */}
+      <section className="py-20 bg-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center max-w-2xl mx-auto mb-16">
+            <h2 className="text-3xl font-bold text-primary mb-4">Our Pure Oils</h2>
+            <p className="text-neutral-600 font-inter">Explore our range of traditionally extracted cold-pressed oils.</p>
+          </div>
+          
+          <div className="grid grid-cols-2 lg:grid-cols-5 gap-6">
+            {categories.map((cat) => (
+              <Link key={cat.slug} href={`/products?category=${cat.slug}`} className="group flex flex-col items-center lift-effect">
+                <div className={`w-32 h-32 rounded-full ${cat.color} border-4 border-white shadow-md flex items-center justify-center p-6 relative overflow-hidden`}>
+                   <div className="absolute inset-0 bg-secondary/10 opacity-0 group-hover:opacity-100 transition-opacity" />
+                   <CategoryIcons type={cat.type} />
+                </div>
+                <h3 className="mt-4 font-bold text-foreground group-hover:text-primary transition-colors">{cat.name}</h3>
+              </Link>
+            ))}
+          </div>
         </div>
-      </main>
-    </div>
+      </section>
+
+      {/* Why Choose Us */}
+      <section className="py-20 bg-primary/5">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
+            {features.map((feature, idx) => (
+              <div key={idx} className="bg-white p-8 rounded-2xl shadow-sm border border-neutral-100 lift-effect text-center group">
+                <div className="w-20 h-20 mx-auto bg-primary/10 rounded-full flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+                  {feature.icon}
+                </div>
+                <h3 className="text-xl font-bold text-foreground mb-3">{feature.title}</h3>
+                <p className="text-neutral-600 font-inter leading-relaxed">{feature.desc}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Wholesale Banner */}
+      <section className="py-24 bg-primary relative overflow-hidden">
+        {/* Animated Background loop */}
+         <div className="absolute inset-0 opacity-10 pointer-events-none">
+            <svg width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
+              <defs>
+                <pattern id="gear" x="0" y="0" width="100" height="100" patternUnits="userSpaceOnUse">
+                   <path d="M50 20 L50 10 M80 50 L90 50 M50 80 L50 90 M20 50 L10 50" stroke="white" strokeWidth="4" />
+                   <circle cx="50" cy="50" r="20" fill="none" stroke="white" strokeWidth="4" />
+                </pattern>
+              </defs>
+              <rect width="100%" height="100%" fill="url(#gear)">
+                  <animateTransform attributeName="transform" type="translate" values="0,0; -100,-100" dur="20s" repeatCount="indefinite" />
+              </rect>
+            </svg>
+         </div>
+        <div className="max-w-4xl mx-auto px-4 text-center relative z-10">
+          <h2 className="text-4xl font-bold text-white mb-6">Looking for Bulk Orders?</h2>
+          <p className="text-xl text-primary-light mb-10 font-inter">We supply high-quality cold-pressed oils at wholesale prices for businesses and large familiy needs.</p>
+          <Link href="/wholesale" className="inline-block px-10 py-4 bg-secondary text-white font-bold rounded-lg hover:bg-secondary/90 transition-all glow-effect text-lg">
+            Request Wholesale Quote
+          </Link>
+        </div>
+      </section>
+    </main>
   );
 }
