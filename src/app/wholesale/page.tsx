@@ -30,35 +30,73 @@ export default function WholesalePage() {
                <p className="text-neutral-600">Provide direct-from-mill purity to your customers. Fill the form below for wholesale pricing and bulk orders.</p>
             </div>
 
-            <form className="space-y-6">
+            <form 
+              action="https://formspree.io/f/YOUR_FORM_ID" 
+              method="POST" 
+              className="space-y-6"
+            >
+              {/* Hidden input for subject */}
+              <input type="hidden" name="_subject" value="Wholesale Inquiry - Revathi Store" />
+              
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                  <div>
                    <label className="block text-sm font-bold text-foreground mb-2">Business Name</label>
-                   <input type="text" className="w-full px-4 py-3 rounded-xl border border-neutral-300 focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all bg-white/50" placeholder="Your Company Name" required />
+                   <input 
+                     type="text" 
+                     name="business_name"
+                     className="w-full px-4 py-3 rounded-xl border border-neutral-300 focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all bg-white/50" 
+                     placeholder="Your Company Name" 
+                     required 
+                   />
                  </div>
                  <div>
                    <label className="block text-sm font-bold text-foreground mb-2">Contact Person</label>
-                   <input type="text" className="w-full px-4 py-3 rounded-xl border border-neutral-300 focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all bg-white/50" placeholder="Your Name" required />
+                   <input 
+                     type="text" 
+                     name="contact_person"
+                     className="w-full px-4 py-3 rounded-xl border border-neutral-300 focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all bg-white/50" 
+                     placeholder="Your Name" 
+                     required 
+                   />
                  </div>
               </div>
               
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                  <div>
                    <label className="block text-sm font-bold text-foreground mb-2">Phone Number</label>
-                   <input type="tel" className="w-full px-4 py-3 rounded-xl border border-neutral-300 focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all bg-white/50" placeholder="+91 xxxxx xxxxx" required />
+                   <input 
+                     type="tel" 
+                     name="phone"
+                     className="w-full px-4 py-3 rounded-xl border border-neutral-300 focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all bg-white/50" 
+                     placeholder="+91 xxxxx xxxxx" 
+                     required 
+                   />
                  </div>
                  <div>
                    <label className="block text-sm font-bold text-foreground mb-2">Email Address</label>
-                   <input type="email" className="w-full px-4 py-3 rounded-xl border border-neutral-300 focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all bg-white/50" placeholder="mail@company.com" />
+                   <input 
+                     type="email" 
+                     name="email"
+                     className="w-full px-4 py-3 rounded-xl border border-neutral-300 focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all bg-white/50" 
+                     placeholder="mail@company.com" 
+                   />
                  </div>
               </div>
 
               <div>
                 <label className="block text-sm font-bold text-foreground mb-2">Requirements / Estimated MOQ</label>
-                <textarea rows={4} className="w-full px-4 py-3 rounded-xl border border-neutral-300 focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all bg-white/50 resize-none" placeholder="e.g. Need 100 liters of Groundnut oil per month..."></textarea>
+                <textarea 
+                  rows={4} 
+                  name="requirements"
+                  className="w-full px-4 py-3 rounded-xl border border-neutral-300 focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all bg-white/50 resize-none" 
+                  placeholder="e.g. Need 100 liters of Groundnut oil per month..."
+                ></textarea>
               </div>
 
-              <button type="submit" className="w-full py-4 bg-primary text-white font-bold rounded-xl hover:bg-primary/90 transition-all shadow-lg hover:shadow-primary/30 active:scale-95 duration-150">
+              <button 
+                type="submit" 
+                className="w-full py-4 bg-primary text-white font-bold rounded-xl hover:bg-primary/90 transition-all shadow-lg hover:shadow-primary/30 active:scale-95 duration-150"
+              >
                  Submit Inquiry
               </button>
             </form>
