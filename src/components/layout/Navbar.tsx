@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import Image from 'next/image';
 
 export default function Navbar() {
   return (
@@ -7,13 +8,14 @@ export default function Navbar() {
         <div className="flex justify-between items-center h-20">
           {/* Logo Section */}
           <Link href="/" className="flex items-center gap-3 group">
-             <div className="relative w-12 h-12 flex items-center justify-center bg-primary rounded-full shadow-lg group-hover:shadow-primary/50 transition-shadow">
-                {/* Unique Logo SVG: Oil drop + wooden press */}
-                <svg viewBox="0 0 100 100" className="w-8 h-8 text-secondary transform group-hover:scale-110 transition-transform">
-                  <path d="M50 15 Q30 45 30 70 A20 20 0 0 0 70 70 Q70 45 50 15 Z" fill="currentColor" />
-                  <rect x="45" y="40" width="10" height="40" fill="#1B5E20" />
-                  <rect x="35" y="60" width="30" height="10" fill="#1B5E20" />
-                </svg>
+             <div className="relative w-12 h-12 flex items-center justify-center bg-primary rounded-full shadow-lg group-hover:shadow-primary/50 transition-shadow overflow-hidden">
+                <Image
+                  src="/images/RSlogo.png"
+                  alt="Revathi Store Logo"
+                  width={48}
+                  height={48}
+                  className="object-cover group-hover:scale-110 transition-transform"
+                />
              </div>
              <div className="flex flex-col">
                 <span className="text-xl font-bold text-primary leading-tight">REVATHI</span>
