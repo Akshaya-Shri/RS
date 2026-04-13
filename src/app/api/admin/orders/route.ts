@@ -73,7 +73,8 @@ export async function PUT(req: Request) {
     };
 
     try {
-      await fetch(`${process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'}/api/notify/whatsapp`, {
+      const notifyPath = process.env.SMS_PROVIDER ? '/api/notify/sms' : '/api/notify/whatsapp';
+      await fetch(`${process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'}${notifyPath}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -85,9 +86,9 @@ export async function PUT(req: Request) {
             statusDisplay: statusDisplay[status] || status
           }
         })
-      }).catch(err => console.error('WhatsApp notification failed:', err));
+      }).catch(err => console.error('Notification failed:', err));
     } catch (notifyError) {
-      console.error('Failed to send WhatsApp notification:', notifyError);
+      console.error('Failed to send notification:', notifyError);
       // Don't fail the status update if notification fails
     }
 

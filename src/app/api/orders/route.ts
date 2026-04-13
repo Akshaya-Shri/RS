@@ -74,9 +74,10 @@ export async function POST(req: Request) {
     orders.push(newOrder);
     writeOrders(orders);
 
-    // Send WhatsApp notification
+    // Send notification (SMS if configured, otherwise WhatsApp)
+    const notifyPath = process.env.SMS_PROVIDER ? '/api/notify/sms' : '/api/notify/whatsapp';
     try {
-      await fetch(`${process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'}/api/notify/whatsapp`, {
+      await fetch(`${process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'}${notifyPath}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -88,9 +89,9 @@ export async function POST(req: Request) {
             items: items
           }
         })
-      }).catch(err => console.error('WhatsApp notification failed:', err));
+      }).catch(err => console.error('Notification failed:', err));
     } catch (notifyError) {
-      console.error('Failed to send WhatsApp notification:', notifyError);
+      console.error('Failed to send notification:', notifyError);
       // Don't fail the order creation if notification fails
     }
 
