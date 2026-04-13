@@ -31,7 +31,7 @@ export default function WholesalePage() {
             </div>
 
             <form 
-              action="https://formspree.io/f/YOUR_FORM_ID" 
+              action="https://formspree.io/f/xpqyolpw" 
               method="POST" 
               className="space-y-6"
             >
