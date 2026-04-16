@@ -1,20 +1,25 @@
+'use client';
+
 import OilPourHeroSVG from '@/components/ui/OilPourHeroSVG';
 import Image from 'next/image';
 import Link from 'next/link';
+import { useLanguage } from '@/context/LanguageContext';
 
 export default function Home() {
+  const { t } = useLanguage();
+
   const categories = [
-    { name: 'Groundnut Oil', type: 'groundnut' as const, slug: 'groundnut', color: 'bg-orange-50', imageUrl: '/images/Oilimages/groundnutoil.png' },
-    { name: 'Coconut Oil', type: 'coconut' as const, slug: 'coconut', color: 'bg-amber-50', imageUrl: '/images/Oilimages/cocunutoil.png' },
-    { name: 'Sesame Oil', type: 'sesame' as const, slug: 'sesame', color: 'bg-green-50', imageUrl: '/images/Oilimages/sesameoil.png' },
-    { name: 'Castor Oil', type: 'castor' as const, slug: 'castor', color: 'bg-purple-50', imageUrl: '/images/Oilimages/castoroil.png' },
-    { name: 'Deepam Oil', type: 'deepam' as const, slug: 'deepam', color: 'bg-red-50', imageUrl: '/images/Oilimages/deepamoil.png' },
+    { nameKey: 'home.groundnutOil', type: 'groundnut' as const, slug: 'groundnut', color: 'bg-orange-50', imageUrl: '/images/Oilimages/groundnutoil.png' },
+    { nameKey: 'home.coconutOil', type: 'coconut' as const, slug: 'coconut', color: 'bg-amber-50', imageUrl: '/images/Oilimages/cocunutoil.png' },
+    { nameKey: 'home.sesameOil', type: 'sesame' as const, slug: 'sesame', color: 'bg-green-50', imageUrl: '/images/Oilimages/sesameoil.png' },
+    { nameKey: 'home.castorOil', type: 'castor' as const, slug: 'castor', color: 'bg-purple-50', imageUrl: '/images/Oilimages/castoroil.png' },
+    { nameKey: 'home.deepamOil', type: 'deepam' as const, slug: 'deepam', color: 'bg-red-50', imageUrl: '/images/Oilimages/deepamoil.png' },
   ];
 
   const features = [
     { 
-      title: 'Pure Extraction', 
-      desc: 'Traditional wooden press (chekku) extraction retaining maximum nutrients.',
+      titleKey: 'home.pureExtraction', 
+      descKey: 'home.pureExtractionDesc',
       icon: (
         <svg viewBox="0 0 24 24" className="w-12 h-12 text-primary" fill="none" stroke="currentColor" strokeWidth="2">
           <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" strokeLinecap="round" strokeLinejoin="round"/>
@@ -22,8 +27,8 @@ export default function Home() {
       )
     },
     { 
-      title: 'Direct From Mill', 
-      desc: 'No middlemen. Directly sourced from our Theni facility since 1975.',
+      titleKey: 'home.directFromMill', 
+      descKey: 'home.directFromMillDesc',
       icon: (
         <svg viewBox="0 0 24 24" className="w-12 h-12 text-secondary" fill="none" stroke="currentColor" strokeWidth="2">
           <path d="M3 21h18M3 7v1a3 3 0 0 0 6 0v-1m0 1a3 3 0 0 0 6 0v-1m0 1a3 3 0 0 0 6 0v-1h-18l2-4h14l2 4M5 21V10.85M19 21V10.85M9 21v-4a2 2 0 0 1 4 0v4"/>
@@ -31,8 +36,8 @@ export default function Home() {
       )
     },
     { 
-      title: 'MSME Certified', 
-      desc: 'Government recognized quality standard and authentic manufacturing.',
+      titleKey: 'home.msemCertified', 
+      descKey: 'home.msemCertifiedDesc',
       icon: (
         <svg viewBox="0 0 24 24" className="w-12 h-12 text-primary-light" fill="none" stroke="currentColor" strokeWidth="2">
           <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" strokeLinecap="round" strokeLinejoin="round"/>
@@ -53,14 +58,14 @@ export default function Home() {
                 Since 1975
               </div>
               <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold text-foreground leading-tight">
-                From our own <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-secondary">oil mill</span> to your home.
+                {t('home.heroTitle')} <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-secondary">oil mill</span> to your home.
               </h1>
               <p className="text-xl text-neutral-600 font-inter">
-                Experience the tradition and purity of cold-pressed oils. Authentic, nutritious, and straight from the source.
+                {t('home.heroSubtitle')}
               </p>
               <div className="flex flex-wrap gap-4 pt-4">
                 <Link href="/products" className="px-8 py-4 bg-primary text-white font-bold rounded-lg hover:bg-primary/90 transition-colors shadow-lg shadow-primary/30 flex items-center gap-2 group">
-                  Shop Now
+                  {t('home.exploreProducts')}
                   <svg className="w-5 h-5 group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
                   </svg>
@@ -93,9 +98,9 @@ export default function Home() {
               <Link key={cat.slug} href={`/products?category=${cat.slug}`} className="group flex flex-col items-center lift-effect">
                 <div className={`w-32 h-32 rounded-full ${cat.color} border-4 border-white shadow-md flex items-center justify-center relative overflow-hidden`}>
                    <div className="absolute inset-0 bg-secondary/10 opacity-0 group-hover:opacity-100 transition-opacity z-10" />
-                   <Image src={cat.imageUrl} alt={cat.name} fill className="object-cover p-2" />
+                   <Image src={cat.imageUrl} alt={t(cat.nameKey)} fill className="object-cover p-2" />
                 </div>
-                <h3 className="mt-4 font-bold text-foreground group-hover:text-primary transition-colors">{cat.name}</h3>
+                <h3 className="mt-4 font-bold text-foreground group-hover:text-primary transition-colors text-center">{t(cat.nameKey)}</h3>
               </Link>
             ))}
           </div>
@@ -105,14 +110,15 @@ export default function Home() {
       {/* Why Choose Us */}
       <section className="py-20 bg-primary/5">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <h2 className="text-3xl font-bold text-center text-primary mb-16">{t('home.whyChooseUs')}</h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
             {features.map((feature, idx) => (
               <div key={idx} className="bg-white p-8 rounded-2xl shadow-sm border border-neutral-100 lift-effect text-center group">
                 <div className="w-20 h-20 mx-auto bg-primary/10 rounded-full flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
                   {feature.icon}
                 </div>
-                <h3 className="text-xl font-bold text-foreground mb-3">{feature.title}</h3>
-                <p className="text-neutral-600 font-inter leading-relaxed">{feature.desc}</p>
+                <h3 className="text-xl font-bold text-foreground mb-3">{t(feature.titleKey)}</h3>
+                <p className="text-neutral-600 font-inter leading-relaxed">{t(feature.descKey)}</p>
               </div>
             ))}
           </div>
@@ -137,7 +143,7 @@ export default function Home() {
          </div>
         <div className="max-w-4xl mx-auto px-4 text-center relative z-10">
           <h2 className="text-4xl font-bold text-white mb-6">Looking for Bulk Orders?</h2>
-          <p className="text-xl text-primary-light mb-10 font-inter">We supply high-quality cold-pressed oils at wholesale prices for businesses and large familiy needs.</p>
+          <p className="text-xl text-primary-light mb-10 font-inter">We supply high-quality cold-pressed oils at wholesale prices for businesses and large family needs.</p>
           <Link href="/wholesale" className="inline-block px-10 py-4 bg-secondary text-white font-bold rounded-lg hover:bg-secondary/90 transition-all glow-effect text-lg">
             Request Wholesale Quote
           </Link>

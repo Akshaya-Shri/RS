@@ -1,7 +1,13 @@
+'use client';
+
 import Link from 'next/link';
 import Image from 'next/image';
+import { useLanguage } from '@/context/LanguageContext';
+import LanguageSwitcher from '@/components/ui/LanguageSwitcher';
 
 export default function Navbar() {
+  const { t } = useLanguage();
+
   return (
     <nav className="sticky top-0 z-50 bg-brand-white/90 backdrop-blur-md shadow-sm border-b border-primary-light/30">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -25,15 +31,16 @@ export default function Navbar() {
 
           {/* Desktop Menu */}
           <div className="hidden md:flex space-x-8 items-center">
-            <Link href="/" className="text-foreground hover:text-primary font-medium transition-colors">Home</Link>
-            <Link href="/products" className="text-foreground hover:text-primary font-medium transition-colors">Products</Link>
-            <Link href="/wholesale" className="text-foreground hover:text-primary font-medium transition-colors">Wholesale</Link>
-            <Link href="/about" className="text-foreground hover:text-primary font-medium transition-colors">About Us</Link>
-            <Link href="/contact" className="text-foreground hover:text-primary font-medium transition-colors">Contact</Link>
+            <Link href="/" className="text-foreground hover:text-primary font-medium transition-colors">{t('nav.home')}</Link>
+            <Link href="/products" className="text-foreground hover:text-primary font-medium transition-colors">{t('nav.products')}</Link>
+            <Link href="/wholesale" className="text-foreground hover:text-primary font-medium transition-colors">{t('nav.wholesale')}</Link>
+            <Link href="/about" className="text-foreground hover:text-primary font-medium transition-colors">{t('nav.about')}</Link>
+            <Link href="/contact" className="text-foreground hover:text-primary font-medium transition-colors">{t('nav.contact')}</Link>
           </div>
 
-          {/* Cart Icon */}
+          {/* Cart Icon and Language Switcher */}
           <div className="flex items-center space-x-4">
+            <LanguageSwitcher />
             <Link href="/cart" className="relative p-2 text-primary hover:text-secondary transition-colors group">
                <svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="group-hover:scale-110 transition-transform">
                  <circle cx="8" cy="21" r="1"/><circle cx="19" cy="21" r="1"/>

@@ -5,6 +5,7 @@ import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
 import FloatingWhatsApp from "@/components/ui/FloatingWhatsApp";
 import { CartProvider } from "@/components/cart/CartProvider";
+import { LanguageProvider } from "@/context/LanguageContext";
 
 export default function ClientLayout({
   children,
@@ -15,11 +16,13 @@ export default function ClientLayout({
   const isAdminPage = pathname.startsWith('/admin');
 
   return (
-    <CartProvider>
-      {!isAdminPage && <Navbar />}
-      {children}
-      {!isAdminPage && <Footer />}
-      {!isAdminPage && <FloatingWhatsApp />}
-    </CartProvider>
+    <LanguageProvider>
+      <CartProvider>
+        {!isAdminPage && <Navbar />}
+        {children}
+        {!isAdminPage && <Footer />}
+        {!isAdminPage && <FloatingWhatsApp />}
+      </CartProvider>
+    </LanguageProvider>
   );
 }
