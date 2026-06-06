@@ -55,10 +55,10 @@ export default function Home() {
             <div className="space-y-8">
               <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 text-primary text-sm font-bold tracking-wide">
                 <span className="w-2 h-2 rounded-full bg-primary animate-ping" />
-                Since 1975
+                {t('home.since1975')}
               </div>
               <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold text-foreground leading-tight">
-                {t('home.heroTitle')} <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-secondary">oil mill</span> to your home.
+                {t('home.heroTitle')} <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-secondary">{t('home.heroOilMillWord')}</span> to your home.
               </h1>
               <p className="text-xl text-neutral-600 font-inter">
                 {t('home.heroSubtitle')}
@@ -71,7 +71,7 @@ export default function Home() {
                   </svg>
                 </Link>
                 <Link href="/wholesale" className="px-8 py-4 bg-white text-primary border-2 border-primary font-bold rounded-lg hover:bg-neutral-50 transition-colors">
-                  Wholesale Inquiry
+                  {t('home.wholesaleInquiry')}
                 </Link>
               </div>
             </div>
@@ -89,8 +89,8 @@ export default function Home() {
       <section className="py-20 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center max-w-2xl mx-auto mb-16">
-            <h2 className="text-3xl font-bold text-primary mb-4">Our Pure Oils</h2>
-            <p className="text-neutral-600 font-inter">Explore our range of traditionally extracted cold-pressed oils.</p>
+            <h2 className="text-3xl font-bold text-primary mb-4">{t('home.ourPureOils')}</h2>
+            <p className="text-neutral-600 font-inter">{t('home.ourPureOilsDesc')}</p>
           </div>
           
           <div className="grid grid-cols-2 lg:grid-cols-5 gap-6">
@@ -141,11 +141,11 @@ export default function Home() {
               </rect>
             </svg>
          </div>
-        <div className="max-w-4xl mx-auto px-4 text-center relative z-10">
-          <h2 className="text-4xl font-bold text-white mb-6">Looking for Bulk Orders?</h2>
-          <p className="text-xl text-primary-light mb-10 font-inter">We supply high-quality cold-pressed oils at wholesale prices for businesses and large family needs.</p>
+          <div className="max-w-4xl mx-auto px-4 text-center relative z-10">
+          <h2 className="text-4xl font-bold text-white mb-6">{t('home.wholesaleBannerTitle')}</h2>
+          <p className="text-xl text-primary-light mb-10 font-inter">{t('home.wholesaleBannerDesc')}</p>
           <Link href="/wholesale" className="inline-block px-10 py-4 bg-secondary text-white font-bold rounded-lg hover:bg-secondary/90 transition-all glow-effect text-lg">
-            Request Wholesale Quote
+            {t('home.requestWholesaleQuote')}
           </Link>
         </div>
       </section>

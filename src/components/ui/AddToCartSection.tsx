@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useCart } from '@/components/cart/CartProvider';
+import { useLanguage } from '@/context/LanguageContext';
 
 export default function AddToCartSection({ product }: { product: { slug: string, name: string, image: string, sizes: string[], pricePerLiter: number, available?: boolean } }) {
   const { slug, name, image, sizes, pricePerLiter, available = true } = product;
@@ -11,6 +12,7 @@ export default function AddToCartSection({ product }: { product: { slug: string,
   
   const { addItem } = useCart();
   const router = useRouter();
+  const { t } = useLanguage();
 
   // Quick helper to estimate price based on size string for realistic UX
   const getPriceMultiplier = (size: string) => {
@@ -29,13 +31,13 @@ export default function AddToCartSection({ product }: { product: { slug: string,
       <div className="flex items-end gap-2">
         <p className="text-3xl font-bold text-secondary">₹{currentPrice}</p>
         <span className="text-base text-neutral-500 font-normal pb-1">
-          {quantity > 1 ? `(Total for ${quantity} x ${selectedSize})` : `/ ${selectedSize}`}
+          {quantity > 1 ? t('products.totalFor').replace('{qty}', String(quantity)).replace('{size}', selectedSize) : `/ ${selectedSize}`}
         </span>
       </div>
 
       {/* Size Selector */}
       <div>
-        <h3 className="font-bold text-foreground mb-3 text-sm uppercase tracking-wider opacity-80">Select Size</h3>
+        <h3 className="font-bold text-foreground mb-3 text-sm uppercase tracking-wider opacity-80">{t('products.selectSize')}</h3>
         <div className="flex flex-wrap gap-2">
           {sizes.map((size) => (
             <button 
@@ -92,11 +94,11 @@ export default function AddToCartSection({ product }: { product: { slug: string,
            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
            </svg>
-           {available ? 'Add to Cart' : 'Out of Stock'}
+           {available ? t('products.addToCart') : t('products.outOfStock')}
         </button>
       </div>
       {!available && (
-        <p className="text-sm text-red-600 font-medium">This product is currently unavailable.</p>
+        <p className="text-sm text-red-600 font-medium">{t('products.currentlyUnavailable')}</p>
       )}
     </div>
   );
