@@ -2,6 +2,7 @@
 
 import AnimatedCounter from "@/components/ui/AnimatedCounter";
 import { useState, useEffect } from 'react';
+import Link from 'next/link';
 
 export default function AdminDashboard() {
   const [stats, setStats] = useState([
@@ -65,7 +66,7 @@ export default function AdminDashboard() {
       <div className="bg-white p-6 rounded-2xl shadow-sm border border-neutral-100">
         <div className="flex justify-between items-center mb-6">
           <h3 className="text-lg font-bold text-foreground">Recent Orders</h3>
-          <a href="/admin/orders" className="text-primary font-bold hover:underline">View All</a>
+          <Link href="/admin/orders" className="text-primary font-bold hover:underline">View All</Link>
         </div>
         {recentOrders.length === 0 ? (
           <div className="text-center py-12">

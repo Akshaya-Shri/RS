@@ -24,7 +24,7 @@ export default function AboutClient() {
             </div>
             <h3 className="text-2xl font-bold text-primary mb-2">{t('about.timeline.beginningTitle')}</h3>
             <p className="font-bold text-secondary mb-4">{t('about.timeline.beginningYear')}</p>
-            <p className="text-neutral-600 leading-relaxed bg-white p-6 rounded-2xl shadow-sm border border-neutral-100">Founded in Theni, Tamil Nadu, by Shanmugavelan A R, Revathi Store began as a humble business with a single wooden press (chekku), supplying pure groundnut and sesame oils to the local community.</p>
+            <p className="text-neutral-600 leading-relaxed bg-white p-6 rounded-2xl shadow-sm border border-neutral-100">{t('about.timeline.beginningDesc')}</p>
           </div>
 
           <div className="relative group">
@@ -33,7 +33,7 @@ export default function AboutClient() {
             </div>
             <h3 className="text-2xl font-bold text-primary mb-2">{t('about.timeline.expansionTitle')}</h3>
             <p className="font-bold text-secondary mb-4">{t('about.timeline.expansionYear')}</p>
-            <p className="text-neutral-600 leading-relaxed bg-white p-6 rounded-2xl shadow-sm border border-neutral-100">Expanded our capacity while retaining traditional extraction methods. Officially recognized by MSME and acquired GST compliance, stepping into wholesale distribution across Tamil Nadu.</p>
+            <p className="text-neutral-600 leading-relaxed bg-white p-6 rounded-2xl shadow-sm border border-neutral-100">{t('about.timeline.expansionDesc')}</p>
           </div>
 
           <div className="relative group">
@@ -42,7 +42,7 @@ export default function AboutClient() {
             </div>
             <h3 className="text-2xl font-bold text-primary mb-2">{t('about.timeline.digitalTitle')}</h3>
             <p className="font-bold text-secondary mb-4">{t('about.timeline.digitalYear')}</p>
-            <p className="text-neutral-600 leading-relaxed bg-white p-6 rounded-2xl shadow-sm border border-neutral-100">Bringing our premium oils directly to consumers pan-India through our digital storefront, eliminating middlemen and ensuring the freshness of the mill reaches your kitchen.</p>
+            <p className="text-neutral-600 leading-relaxed bg-white p-6 rounded-2xl shadow-sm border border-neutral-100">{t('about.timeline.digitalDesc')}</p>
           </div>
         </div>
 

@@ -5,7 +5,7 @@ import Image from 'next/image';
 import { useLanguage } from '@/context/LanguageContext';
 
 export default function ProductsClient({ products, categoryFilter }: { products: any[]; categoryFilter?: string }) {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
 
   return (
     <main className="flex-1 bg-surface py-12">
@@ -30,17 +30,19 @@ export default function ProductsClient({ products, categoryFilter }: { products:
 
         {/* Product Grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
-          {products.map((product: any) => (
-            <div key={product.id} className="bg-white rounded-2xl p-6 shadow-sm border border-neutral-100 lift-effect group flex flex-col items-center">
-              <Link href={`/products/${product.slug}`} className="block w-48 h-48 relative mb-6">
-                 <div className="absolute inset-0 bg-neutral-50 rounded-full group-hover:bg-primary/5 transition-colors flex items-center justify-center overflow-hidden border-4 border-white shadow-sm">
-                    <Image src={product.imageUrl} alt={product.name} fill className="object-cover p-2" />
-                 </div>
-              </Link>
-              <div className="text-center w-full">
-                <Link href={`/products/${product.slug}`}>
-                  <h3 className="font-bold text-lg text-foreground mb-1 group-hover:text-primary transition-colors line-clamp-2 min-h-[56px] leading-tight">{product.name}</h3>
-                </Link>
+           {products.map((product: any) => {
+             const displayName = language === 'ta' && product.name_ta ? product.name_ta : product.name;
+             return (
+               <div key={product.id} className="bg-white rounded-2xl p-6 shadow-sm border border-neutral-100 lift-effect group flex flex-col items-center">
+                 <Link href={`/products/${product.slug}`} className="block w-48 h-48 relative mb-6">
+                    <div className="absolute inset-0 bg-neutral-50 rounded-full group-hover:bg-primary/5 transition-colors flex items-center justify-center overflow-hidden border-4 border-white shadow-sm">
+                       <Image src={product.imageUrl} alt={displayName} fill className="object-cover p-2" />
+                    </div>
+                 </Link>
+                 <div className="text-center w-full">
+                   <Link href={`/products/${product.slug}`}>
+                     <h3 className="font-bold text-lg text-foreground mb-1 group-hover:text-primary transition-colors line-clamp-2 min-h-[56px] leading-tight">{displayName}</h3>
+                   </Link>
                 <div className="flex flex-wrap justify-center gap-2 mb-4">
                   <span className="text-secondary font-bold text-xl">₹{product.price}</span>
                   <span className="text-sm text-neutral-500 font-normal">{t('products.unit') || '/ 1L'}</span>
@@ -64,7 +66,8 @@ export default function ProductsClient({ products, categoryFilter }: { products:
                 )}
               </div>
             </div>
-          ))}
+          );
+        })}
           {products.length === 0 && (
             <div className="col-span-full py-20 text-center text-neutral-500">
                {t('products.noProducts') || 'No products found in this category.'}

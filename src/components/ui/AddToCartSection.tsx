@@ -5,8 +5,8 @@ import { useRouter } from 'next/navigation';
 import { useCart } from '@/components/cart/CartProvider';
 import { useLanguage } from '@/context/LanguageContext';
 
-export default function AddToCartSection({ product }: { product: { slug: string, name: string, image: string, sizes: string[], pricePerLiter: number, available?: boolean } }) {
-  const { slug, name, image, sizes, pricePerLiter, available = true } = product;
+export default function AddToCartSection({ product }: { product: { id: number, slug: string, name: string, image: string, sizes: string[], pricePerLiter: number, available?: boolean } }) {
+  const { id, slug, name, image, sizes, pricePerLiter, available = true } = product;
   const [selectedSize, setSelectedSize] = useState(sizes.find((s: string) => s === '1L') || sizes[0]);
   const [quantity, setQuantity] = useState(1);
   
@@ -77,14 +77,14 @@ export default function AddToCartSection({ product }: { product: { slug: string,
         <button 
           onClick={() => {
             addItem({
-              id: `${slug}-${selectedSize}`,
-              slug,
-              name,
-              size: selectedSize,
-              price: Math.round(pricePerLiter * getPriceMultiplier(selectedSize)), // Base item price
-              image,
-              qty: quantity,
-              product_id: 1 // Default for now - will be updated when we have proper product IDs
+               id: `${slug}-${selectedSize}`,
+               slug,
+               name,
+               size: selectedSize,
+               price: Math.round(pricePerLiter * getPriceMultiplier(selectedSize)), // Base item price
+               image,
+               qty: quantity,
+               product_id: id
             });
             router.push('/cart');
           }}

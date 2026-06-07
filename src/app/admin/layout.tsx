@@ -1,5 +1,7 @@
 "use client";
 
+import Link from 'next/link';
+
 export default function AdminLayout({
   children,
 }: {
@@ -13,18 +15,18 @@ export default function AdminLayout({
           <h2 className="text-xl font-bold text-primary">Admin Control</h2>
         </div>
         <nav className="flex flex-col gap-2 px-4">
-          <a href="/admin" className="px-4 py-3 rounded-lg text-neutral-600 font-medium hover:bg-neutral-50 hover:text-primary transition-colors">
+          <Link href="/admin" className="px-4 py-3 rounded-lg text-neutral-600 font-medium hover:bg-neutral-50 hover:text-primary transition-colors">
             Dashboard Overview
-          </a>
-          <a href="/admin/orders" className="px-4 py-3 rounded-lg text-neutral-600 font-medium hover:bg-neutral-50 hover:text-primary transition-colors">
+          </Link>
+          <Link href="/admin/orders" className="px-4 py-3 rounded-lg text-neutral-600 font-medium hover:bg-neutral-50 hover:text-primary transition-colors">
             Manage Orders
-          </a>
-          <a href="/admin/products" className="px-4 py-3 rounded-lg text-neutral-600 font-medium hover:bg-neutral-50 hover:text-primary transition-colors">
+          </Link>
+          <Link href="/admin/products" className="px-4 py-3 rounded-lg text-neutral-600 font-medium hover:bg-neutral-50 hover:text-primary transition-colors">
             Manage Products
-          </a>
-          <a href="/admin/settings" className="px-4 py-3 rounded-lg text-neutral-600 font-medium hover:bg-neutral-50 hover:text-primary transition-colors">
+          </Link>
+          <Link href="/admin/settings" className="px-4 py-3 rounded-lg text-neutral-600 font-medium hover:bg-neutral-50 hover:text-primary transition-colors">
             QR & Settings
-          </a>
+          </Link>
         </nav>
         <div className="p-4 mt-auto border-t border-neutral-200 mt-12">
           <button 
@@ -46,10 +48,10 @@ export default function AdminLayout({
       <div className="flex-1 overflow-y-auto w-full">
          {/* Mobile Nav Header */}
          <div className="md:hidden bg-white border-b border-neutral-200 p-4 mb-4 flex gap-4 overflow-x-auto items-center">
-            <a href="/admin" className="px-4 py-2 bg-neutral-100 rounded-full whitespace-nowrap font-bold text-sm">Overview</a>
-            <a href="/admin/orders" className="px-4 py-2 bg-neutral-100 rounded-full whitespace-nowrap font-bold text-sm">Orders</a>
-            <a href="/admin/products" className="px-4 py-2 bg-neutral-100 rounded-full whitespace-nowrap font-bold text-sm">Products</a>
-            <a href="/admin/settings" className="px-4 py-2 bg-neutral-100 rounded-full whitespace-nowrap font-bold text-sm">Settings</a>
+            <Link href="/admin" className="px-4 py-2 bg-neutral-100 rounded-full whitespace-nowrap font-bold text-sm">Overview</Link>
+            <Link href="/admin/orders" className="px-4 py-2 bg-neutral-100 rounded-full whitespace-nowrap font-bold text-sm">Orders</Link>
+            <Link href="/admin/products" className="px-4 py-2 bg-neutral-100 rounded-full whitespace-nowrap font-bold text-sm">Products</Link>
+            <Link href="/admin/settings" className="px-4 py-2 bg-neutral-100 rounded-full whitespace-nowrap font-bold text-sm">Settings</Link>
             <button 
                onClick={async () => {
                  await fetch('/api/admin/login', { method: 'POST', body: JSON.stringify({ action: 'logout' }) });

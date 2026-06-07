@@ -25,7 +25,7 @@ export default function ContactClient() {
                  </div>
                  <div>
                     <h3 className="text-xl font-bold text-foreground mb-2">{t('contact.visitStore')}</h3>
-                    <p className="text-neutral-600 font-inter leading-relaxed">Revathi Store<br/>Theni Main Road<br/>Theni, Tamil Nadu - 625531<br/>India</p>
+                    <p className="text-neutral-600 font-inter leading-relaxed whitespace-pre-line">{t('contact.address')}</p>
                  </div>
               </div>
 

@@ -6,7 +6,7 @@ import AddToCartSection from '@/components/ui/AddToCartSection';
 import { useLanguage } from '@/context/LanguageContext';
 
 export default function ProductDetailClient({ product }: { product: any }) {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
 
   const isAvailable = product.available !== false;
 
@@ -19,7 +19,7 @@ export default function ProductDetailClient({ product }: { product: any }) {
           <span className="mx-2">/</span>
           <Link href="/products" className="hover:text-primary transition-colors">{t('nav.products')}</Link>
           <span className="mx-2">/</span>
-          <span className="text-foreground">{product.name}</span>
+          <span className="text-foreground">{language === 'ta' && product.name_ta ? product.name_ta : product.name}</span>
         </nav>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20">
@@ -33,15 +33,16 @@ export default function ProductDetailClient({ product }: { product: any }) {
           {/* Details Column */}
           <div className="flex flex-col">
             <div className="flex flex-wrap items-center gap-3 mb-4">
-              <h1 className="text-3xl md:text-5xl font-bold text-foreground">{product.name}</h1>
+              <h1 className="text-3xl md:text-5xl font-bold text-foreground">{language === 'ta' && product.name_ta ? product.name_ta : product.name}</h1>
               <span className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-semibold ${isAvailable ? 'bg-emerald-100 text-emerald-600' : 'bg-red-100 text-red-600'}`}>
                 {isAvailable ? t('products.inStock') || 'In Stock' : t('products.outOfStock') || 'Out of Stock'}
               </span>
             </div>
-            <p className="text-neutral-600 font-inter leading-relaxed mb-8">{product.description}</p>
+            <p className="text-neutral-600 font-inter leading-relaxed mb-8">{language === 'ta' && product.description_ta ? product.description_ta : product.description}</p>
             <AddToCartSection product={{
+              id: product.id,
               slug: product.slug,
-              name: product.name,
+              name: language === 'ta' && product.name_ta ? product.name_ta : product.name,
               image: product.imageUrl,
               pricePerLiter: product.price,
               sizes: product.sizes,
@@ -58,7 +59,7 @@ export default function ProductDetailClient({ product }: { product: any }) {
                     {t('products.keyBenefits') || 'Key Benefits'}
                  </h3>
                  <ul className="list-disc list-inside text-neutral-600 space-y-1 ml-2 font-inter">
-                   {product.benefits.map((b: string, i: number) => <li key={i}>{b}</li>)}
+                   {((language === 'ta' && product.benefits_ta) ? product.benefits_ta : product.benefits).map((b: string, i: number) => <li key={i}>{b}</li>)}
                  </ul>
                </div>
 
@@ -69,7 +70,7 @@ export default function ProductDetailClient({ product }: { product: any }) {
                     </svg>
                     {t('products.usage') || 'Usage'}
                  </h3>
-                 <p className="text-neutral-600 font-inter ml-7">{product.usage}</p>
+                 <p className="text-neutral-600 font-inter ml-7">{language === 'ta' && product.usage_ta ? product.usage_ta : product.usage}</p>
                </div>
             </div>
 

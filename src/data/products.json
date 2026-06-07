@@ -2,6 +2,7 @@
   {
     "id": 1,
     "name": "Cold Pressed Groundnut Oil",
+    "name_ta": "மரச்செக்கு நிலக்கடலை எண்ணெய்",
     "price": 220,
     "category": "groundnut",
     "slug": "groundnut-oil",
@@ -14,18 +15,27 @@
       "15L (Tin)"
     ],
     "description": "Extracted using traditional wooden cold-press (chekku) methods, ensuring all natural nutrients and authentic aroma are preserved. Ideal for everyday cooking, deep frying, and traditional recipes.",
+    "description_ta": "பாரம்பரிய மரச்செக்கு முறையில் தயாரிக்கப்பட்டு, இயற்கையான சத்துக்களும் அசல் வாசனையும் மாறாமல் பாதுகாக்கப்படுகிறது. தினசரி சமையல், வறுவல் மற்றும் பாரம்பரிய உணவுகள் தயாரிக்க உகந்தது.",
     "benefits": [
       "Rich in heart-healthy MUFA",
       "Contains natural antioxidants",
       "No chemical refining or bleaching",
       "Source of Vitamin E"
     ],
+    "benefits_ta": [
+      "இதய ஆரோக்கியத்திற்கு உகந்த MUFA நிறைந்தது",
+      "இயற்கையான ஆன்டி-ஆக்ஸிடன்ட்கள் கொண்டது",
+      "ரசாயன சுத்திகரிப்பு அல்லது ப்ளீச்சிங் செய்யப்படாதது",
+      "வைட்டமின் E சத்து நிறைந்தது"
+    ],
     "usage": "Suitable for high-heat cooking and raw consumption.",
+    "usage_ta": "அதிக வெப்ப சமையல் மற்றும் நேரடி பயன்பாட்டிற்கு ஏற்றது.",
     "available": false
   },
   {
     "id": 2,
     "name": "Cold Pressed Coconut Oil",
+    "name_ta": "மரச்செக்கு தேங்காய் எண்ணெய்",
     "price": 300,
     "category": "coconut",
     "slug": "coconut-oil",
@@ -38,17 +48,26 @@
       "5L"
     ],
     "description": "Extracted using traditional wooden cold-press (chekku) methods, ensuring all natural nutrients and authentic aroma are preserved. Perfect for baking, frying, skin, and hair care.",
+    "description_ta": "பாரம்பரிய மரச்செக்கு முறையில் பிரித்தெடுக்கப்பட்டு, அதன் இயற்கையான சத்துக்களும் நறுமணமும் முழுமையாக தக்கவைக்கப்படுகிறது. சமையல், பலகாரம் செய்தல், மற்றும் கூந்தல், சரும பராமரிப்பிற்கு மிகவும் சிறந்தது.",
     "benefits": [
       "Rich in Medium Chain Triglycerides (MCTs)",
       "Supports skin and hair health",
       "No chemical refining or bleaching",
       "Antibacterial and antifungal properties"
     ],
-    "usage": "Suitable for cooking, baking, and direct application to skin or hair."
+    "benefits_ta": [
+      "நடுத்தர சங்கிலி ட்ரைகிளிசரைடுகள் (MCTs) நிறைந்தது",
+      "சருமம் மற்றும் கூந்தல் ஆரோக்கியத்திற்கு துணையாகிறது",
+      "ரசாயன சுத்திகரிப்பு அல்லது ப்ளீச்சிங் செய்யப்படாதது",
+      "பாக்டீரியா மற்றும் பூஞ்சை எதிர்ப்பு பண்புகள் கொண்டது"
+    ],
+    "usage": "Suitable for cooking, baking, and direct application to skin or hair.",
+    "usage_ta": "சமையல், பேக்கிங் மற்றும் கூந்தல் அல்லது சருமத்திற்கு நேரடியாகப் பயன்படுத்தலாம்."
   },
   {
     "id": 3,
     "name": "Cold Pressed Sesame Oil",
+    "name_ta": "மரச்செக்கு நல்லெண்ணெய் (எள் எண்ணெய்)",
     "price": 350,
     "category": "sesame",
     "slug": "sesame-oil",
@@ -61,17 +80,26 @@
       "15L (Tin)"
     ],
     "description": "Extracted using traditional wooden cold-press (chekku) methods, ensuring all natural nutrients and authentic aroma are preserved. Essential for traditional South Indian cooking and Ayurvedic practices.",
+    "description_ta": "பாரбавить மரச்செக்கு கொண்டு பிழியப்பட்டு, இயற்கையான ஊட்டச்சத்துக்களும் பாரம்பரிய நறுமணமும் பாதுகாக்கப்படுகிறது. தென்னிந்திய பாரம்பரிய சமையல் மற்றும் ஆயுர்வேத முறைகளுக்கு இன்றியமையாதது.",
     "benefits": [
       "High in lignans and antioxidants",
       "Beneficial for oil pulling",
       "No chemical refining or bleaching",
       "Excellent shelf stability naturally"
     ],
-    "usage": "Suitable for cooking, flavoring gravies, and Ayurvedic therapies."
+    "benefits_ta": [
+      "லிக்னான்கள் மற்றும் ஆன்டி-ஆக்ஸிடன்ட்கள் அதிகம் கொண்டது",
+      "ஆயில் புல்லிங் (வாய் கொப்பளித்தல்) செய்ய சிறந்தது",
+      "ரசாயன சுத்திகரிப்பு அல்லது ப்ளீச்சிங் செய்யப்படாதது",
+      "இயற்கையான முறையில் நீண்ட நாட்கள் கெடாமல் இருக்கும்"
+    ],
+    "usage": "Suitable for cooking, flavoring gravies, and Ayurvedic therapies.",
+    "usage_ta": "சமையல், குழம்பு வகைகள் மற்றும் ஆயுர்வேத சிகிச்சைகளுக்கு உகந்தது."
   },
   {
     "id": 4,
     "name": "Pure Castor Oil",
+    "name_ta": "தூய விளக்கெண்ணெய் (ஆமணக்கு எண்ணெய்)",
     "price": 180,
     "category": "castor",
     "slug": "castor-oil",
@@ -83,17 +111,26 @@
       "1L"
     ],
     "description": "Cold-pressed pure castor oil, carefully extracted to maintain maximum therapeutic properties. Widely used for both health, wellness, and beauty routines.",
+    "description_ta": "குளிர்-அழுத்த முறையில் தயாரிப்பட்ட தூய விளக்கெண்ணெய், அதன் மருத்துவ குணங்களை முழுமையாக பராமரிக்கிறது. உடல் நலன், ஆரோக்கியம் மற்றும் அழகு பராமரிப்புக்கு பரவலாகப் பயன்படுகிறது.",
     "benefits": [
       "Promotes hair thickening and growth",
       "Highly moisturizing for dry skin",
       "No chemical refining or bleaching",
       "Natural laxative properties"
     ],
-    "usage": "Suitable for external skin and hair application, and specific traditional wellness uses."
+    "benefits_ta": [
+      "முடி அடர்த்தியாக வளர உதவுகிறது",
+      "வறண்ட சருமத்திற்கு சிறந்த ஈரப்பதம் அளிக்கிறது",
+      "ரசாயன சுத்திகரிப்பு அல்லது ப்ளீச்சிங் செய்யப்படாதது",
+      "இயற்கையான மலமிளக்கி பண்புகள் கொண்டது"
+    ],
+    "usage": "Suitable for external skin and hair application, and specific traditional wellness uses.",
+    "usage_ta": "கூந்தல் மற்றும் சருமத்தின் வெளிப்புறப் பயன்பாட்டிற்கும், பாரம்பரிய ஆரோக்கிய தேவைகளுக்கும் ஏற்றது."
   },
   {
     "id": 5,
     "name": "Special Deepam Oil",
+    "name_ta": "சிறப்பு தீப எண்ணெய்",
     "price": 120,
     "category": "deepam",
     "slug": "deepam-oil",
@@ -105,12 +142,20 @@
       "5L"
     ],
     "description": "A traditional blend specifically crafted for lighting lamps (diyas). Made from pure, non-edible oils carefully mixed to ensure a long-lasting, soot-free flame representing purity and devotion.",
+    "description_ta": "விளக்கேற்றுவதற்காகவே பிரத்யேகமாக தயாரிக்கப்பட்ட பாரம்பரிய கலவை. தூய்மையான சமையலுக்குப் பயன்படாத எண்ணெய்களின் சரியான கலவை, புகை இல்லாத நீடித்த ஒளிரும் தீபத்தை உறுதி செய்கிறது.",
     "benefits": [
       "Long-lasting and steady flame",
       "Soot-free and clean burning",
       "Blended specifically for auspicious occasions",
       "Not for consumption"
     ],
-    "usage": "Strictly for lighting diyas and spiritual lamps. Not for human consumption."
+    "benefits_ta": [
+      "நீண்ட நேரம் சீராக ஒளிரும் சுடர்",
+      "புகையில்லாத மற்றும் தூய்மையான எரிதல்",
+      "மங்கலகரமான நிகழ்வுகளுக்காக பிரத்யேகமாக கலக்கப்பட்டது",
+      "உண்பதற்கு உகந்தது அல்ல"
+    ],
+    "usage": "Strictly for lighting diyas and spiritual lamps. Not for human consumption.",
+    "usage_ta": "விளக்குகள் மற்றும் ஆன்மீக தீபங்களை ஏற்றுவதற்கு மட்டுமே. மனித நுகர்வுக்கு அல்ல."
   }
 ]
