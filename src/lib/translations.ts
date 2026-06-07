@@ -1,4 +1,32 @@
-export const translations = {
+import { translations as altTranslations } from './alt-translations';
+
+type AnyObj = Record<string, any>;
+
+function isObject(item: any): item is AnyObj {
+  return item !== null && typeof item === 'object' && !Array.isArray(item);
+}
+
+function mergeDeep(target: AnyObj, source: AnyObj): AnyObj {
+  const output: AnyObj = { ...target };
+  if (!isObject(target) || !isObject(source)) {
+    return source ?? target;
+  }
+
+  Object.keys(source).forEach((key) => {
+    const srcVal = source[key];
+    const tgtVal = (target as AnyObj)[key];
+
+    if (isObject(srcVal) && isObject(tgtVal)) {
+      output[key] = mergeDeep(tgtVal, srcVal);
+    } else {
+      output[key] = srcVal;
+    }
+  });
+
+  return output;
+}
+
+const defaultTranslations = {
   en: {
     nav: {
       home: 'Home',
@@ -210,10 +238,10 @@ export const translations = {
       requestWholesaleQuote: 'மொத்த விற்பனை மேற்கோள் கோரி',
       pureExtraction: 'தூய பிரித்தெடுக்க',
       pureExtractionDesc: 'பாரம்பரிய மரமான பத்திரிகைத் தட்டு (சக்கு) பிரித்தெடுத்தல் அதிகபட்ச ஊட்டச்சத்து தக்க வைக்க.',
-      directFromMill: 'நகையிலிருந்து நேரடি',
+      directFromMill: 'நகையிலிருந்து நேரடி',
       directFromMillDesc: 'நடுத்தரவர்த்தகர்கள் இல்லை. நமது தேனி வசதி 1975 முதல் நேரடியாக பெறப்பட்ட.',
       msemCertified: 'MSME சான்றளிக்கப்பட்ட',
-      msemCertifiedDesc: 'அரசு அங்கீகৃத தரம் மற்றும் உண்மையான உற்பாদனம்.',
+      msemCertifiedDesc: 'அரசு அங்கீகෘத தரம் மற்றும் உண்மையான உற்பாदனம்.',
       whyChooseUs: 'ஏன் எங்களைத் தேர்வு செய்யுங்கள்',
       heroTitle: 'தூய, பாரம்பரிய எண்ணெய়கள்',
       heroSubtitle: 'பழைய மரமான பத்திரிகை முறைகள் பயன்படுத்தி குளிர்-அழுத்தப்பட்ட',
@@ -259,6 +287,7 @@ export const translations = {
       selectSize: 'அளவை தேர்வு செய்க',
       currentlyUnavailable: 'இந்த பொருள் இப்போது கிடைக்கவில்லை.',
       totalFor: '({qty} x {size} க்கான மொத்தம்)',
+      deepamOil: 'தீபம் எண்ணெய்',
     },
     about: {
       aboutUs: 'எங்களைப் பற்றி',
@@ -384,3 +413,5 @@ export const translations = {
     },
   },
 };
+
+export const translations = mergeDeep(defaultTranslations, (altTranslations as AnyObj) || {});

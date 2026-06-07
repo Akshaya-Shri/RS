@@ -1,3 +1,4 @@
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+Tamil:wght@400;700&display=swap');
 @import "tailwindcss";
 
 @theme {
@@ -15,6 +16,58 @@
     background-color: var(--color-background);
     color: var(--color-foreground);
   }
+}
+
+/* Font utility classes mapped to next/font CSS variables and Tamil font fallback */
+@layer base {
+  .font-inter {
+    font-family: var(--font-inter), ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif;
+  }
+
+  .font-outfit {
+    font-family: var(--font-outfit), ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif;
+  }
+
+  .font-tamil {
+    font-family: 'Noto Sans Tamil', var(--font-outfit), ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  }
+}
+
+/* Language-aware typography tweaks to improve Tamil/English mixed layouts */
+html[data-lang="ta"] body {
+  /* Prefer Tamil font for Tamil-language pages; Latin characters fall back to Outfit/Inter */
+  font-family: 'Noto Sans Tamil', var(--font-outfit), ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+}
+
+/* Increase line-height and slightly loosen tracking for Tamil to avoid awkward breaks */
+html[data-lang="ta"] h1,
+html[data-lang="ta"] h2,
+html[data-lang="ta"] h3,
+html[data-lang="ta"] p,
+html[data-lang="ta"] li {
+  line-height: 1.45;
+  letter-spacing: 0.01em;
+}
+
+/* Responsive scaling tuned for Tamil headings so line breaks remain balanced */
+html[data-lang="ta"] h1 {
+  font-size: clamp(1.75rem, 4.5vw, 3rem);
+  line-height: 1.12; /* slightly tighter for large headings while keeping multi-line balance */
+}
+
+html[data-lang="ta"] p {
+  font-size: clamp(1rem, 2.2vw, 1.125rem);
+}
+
+/* Improve wrapping behaviour for Tamil to avoid awkward breaks while preventing overflow */
+html[data-lang="ta"] h1,
+html[data-lang="ta"] h2,
+html[data-lang="ta"] h3,
+html[data-lang="ta"] p,
+html[data-lang="ta"] li {
+  word-break: normal;
+  overflow-wrap: anywhere;
+  hyphens: auto;
 }
 
 @layer utilities {

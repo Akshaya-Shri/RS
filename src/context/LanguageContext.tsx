@@ -26,6 +26,16 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
     setMounted(true);
   }, []);
 
+  useEffect(() => {
+    // Reflect current language on the root HTML element so CSS can target it
+    try {
+      document.documentElement.setAttribute('data-lang', language);
+      document.documentElement.lang = language === 'ta' ? 'ta' : 'en';
+    } catch (e) {
+      // ignore during SSR or restricted environments
+    }
+  }, [language]);
+
   const handleSetLanguage = (lang: Language) => {
     setLanguage(lang);
     localStorage.setItem('language', lang);
