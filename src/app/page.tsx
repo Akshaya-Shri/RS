@@ -58,7 +58,7 @@ export default function Home() {
                 {t('home.since1975')}
               </div>
               <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold text-foreground leading-tight">
-                {t('home.heroTitle')} <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-secondary">{t('home.heroOilMillWord')}</span> to your home.
+                {t('home.heroTitleFull')}
               </h1>
               <p className="text-xl text-neutral-600 font-inter">
                 {t('home.heroSubtitle')}
