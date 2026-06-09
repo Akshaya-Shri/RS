@@ -1,21 +1,21 @@
-import mysql from 'mysql2/promise';
+import { Pool } from 'pg';
 
 declare global {
-  var _mysqlPool: mysql.Pool | undefined;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  var _pgPool: any | undefined;
 }
 
-const pool = global._mysqlPool || mysql.createPool({
-  host: process.env.DB_HOST || 'localhost',
-  user: process.env.DB_USER || 'root',
-  password: process.env.DB_PASSWORD || '',
-  database: process.env.DB_NAME || 'revathi_store',
-  waitForConnections: true,
-  connectionLimit: 10,
-  queueLimit: 0
+const connectionString =
+  process.env.DATABASE_URL ||
+  `postgresql://${process.env.DB_USER || 'postgres'}:${process.env.DB_PASSWORD || ''}@${process.env.DB_HOST || 'localhost'}:${process.env.DB_PORT || 5432}/${process.env.DB_NAME || 'revathi_store'}`;
+
+const pool = global._pgPool || new Pool({
+  connectionString,
+  max: 10,
 });
 
 if (process.env.NODE_ENV !== 'production') {
-  global._mysqlPool = pool;
+  global._pgPool = pool;
 }
 
 export default pool;

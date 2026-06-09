@@ -5,17 +5,18 @@ export async function GET(request: Request) {
   try {
     const { searchParams } = new URL(request.url);
     const category = searchParams.get('category');
-    
+
     let query = 'SELECT * FROM products';
-    let params: any[] = [];
-    
+    const params: any[] = [];
+
     if (category) {
-      query += ' WHERE type = ?';
+      query += ' WHERE type = $1';
       params.push(category);
     }
-    
-    const [rows] = await pool.query(query, params);
-    
+
+    const result = await pool.query(query, params);
+    const rows = result.rows;
+
     return NextResponse.json({ success: true, data: rows });
   } catch (error) {
     console.error('Database Error:', error);
