@@ -3,6 +3,8 @@ import fs from 'fs';
 import path from 'path';
 
 const ORDERS_FILE = path.join(process.cwd(), 'src/data/orders.json');
+const PRODUCTS_FILE = path.join(process.cwd(), 'src/data/products.json');
+const INVENTORY_AUDIT_FILE = path.join(process.cwd(), 'src/data/inventory_audit.json');
 
 // Helper function to read orders
 function readOrders() {
@@ -18,6 +20,32 @@ function readOrders() {
 // Helper function to write orders
 function writeOrders(orders: any[]) {
   fs.writeFileSync(ORDERS_FILE, JSON.stringify(orders, null, 2), 'utf8');
+}
+
+function readProducts() {
+  try {
+    const data = fs.readFileSync(PRODUCTS_FILE, 'utf8');
+    return JSON.parse(data);
+  } catch (error) {
+    return [];
+  }
+}
+
+function writeProducts(products: any[]) {
+  fs.writeFileSync(PRODUCTS_FILE, JSON.stringify(products, null, 2), 'utf8');
+}
+
+function readAudit() {
+  try {
+    const data = fs.readFileSync(INVENTORY_AUDIT_FILE, 'utf8');
+    return JSON.parse(data);
+  } catch (error) {
+    return [];
+  }
+}
+
+function writeAudit(audit: any[]) {
+  fs.writeFileSync(INVENTORY_AUDIT_FILE, JSON.stringify(audit, null, 2), 'utf8');
 }
 
 export async function GET() {
@@ -60,7 +88,51 @@ export async function PUT(req: Request) {
     }
 
     const order = orders[orderIndex];
+    const prevStatus = order.status;
     orders[orderIndex].status = status;
+
+    // If moving to shipped from a non-shipped state, finalize inventory: decrement stock and reduce reserved
+    if (status === 'shipped' && prevStatus !== 'shipped') {
+      const products = readProducts();
+      const audit = readAudit();
+
+      for (const item of order.items || []) {
+        const prod = products.find((p: any) => p.id === item.product_id);
+        if (!prod) continue;
+
+        prod.stock = typeof prod.stock === 'number' ? prod.stock : 0;
+        prod.reserved = typeof prod.reserved === 'number' ? prod.reserved : 0;
+
+        const qty = item.quantity || 0;
+
+        // Deduct from reserved first, then from stock if reserved insufficient
+        const reservedDeduct = Math.min(prod.reserved, qty);
+        prod.reserved = prod.reserved - reservedDeduct;
+        const remaining = qty - reservedDeduct;
+        prod.stock = Math.max(0, prod.stock - remaining);
+
+        // Update stock_status
+        const lowThreshold = typeof prod.low_stock_threshold === 'number' ? prod.low_stock_threshold : 0;
+        const availableAfter = prod.stock - prod.reserved;
+        prod.stock_status = availableAfter <= 0 ? 'out_of_stock' : (availableAfter <= lowThreshold ? 'low' : 'in_stock');
+
+        // Append audit entry
+        audit.push({
+          id: audit.length ? Math.max(...audit.map((a: any) => a.id || 0)) + 1 : 1,
+          product_id: prod.id,
+          change: -qty,
+          from: 'reserved',
+          to: 'stock',
+          reason: `Order #${order.id} shipped`,
+          user: 'system',
+          at: new Date().toISOString()
+        });
+      }
+
+      writeProducts(products);
+      writeAudit(audit);
+    }
+
     writeOrders(orders);
 
     // Send WhatsApp notification for status update

@@ -65,7 +65,8 @@ export default function AdminOrdersPage() {
           setSelectedOrder({ ...selectedOrder, status: newStatus });
         }
       } else {
-        alert('Failed to update order status');
+        // show server-provided message when present
+        alert(json.message || 'Failed to update order status');
       }
     } catch (e) {
       alert('Error updating order status');
@@ -233,6 +234,21 @@ export default function AdminOrdersPage() {
                   {/* Order Items */}
                   {selectedOrder.items && selectedOrder.items.length > 0 && (
                     <div>
+                    <div className="p-6 border-t border-neutral-200 flex justify-end gap-3">
+                      <button
+                        onClick={() => updateOrderStatus(selectedOrder.id, 'shipped')}
+                        disabled={updatingStatus === selectedOrder.id || selectedOrder.status === 'shipped'}
+                        className="px-4 py-2 bg-purple-600 text-white rounded-lg font-bold hover:bg-purple-700 disabled:opacity-50"
+                      >
+                        {updatingStatus === selectedOrder.id ? 'Updating…' : 'Mark Shipped'}
+                      </button>
+                      <button
+                        onClick={() => setSelectedOrder(null)}
+                        className="px-4 py-2 bg-neutral-100 text-neutral-700 rounded-lg font-bold hover:bg-neutral-200"
+                      >
+                        Close
+                      </button>
+                    </div>
                       <h3 className="font-bold text-neutral-700 mb-2">Order Items</h3>
                       <div className="border border-neutral-200 rounded-lg overflow-hidden">
                         <table className="w-full">

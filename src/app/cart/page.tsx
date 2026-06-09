@@ -4,11 +4,21 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { useCart } from '@/components/cart/CartProvider';
 import { useLanguage } from '@/context/LanguageContext';
-import productsData from '@/data/products.json';
+import { useEffect, useState } from 'react';
 
 export default function CartPage() {
   const { cartItems, updateQuantity, removeItem, subtotal, shipping, total } = useCart();
   const { t, language } = useLanguage();
+   const [productsData, setProductsData] = useState<any[]>([]);
+
+   useEffect(() => {
+      let mounted = true;
+      fetch('/api/products')
+         .then(r => r.json())
+         .then(j => { if (mounted && j.success) setProductsData(j.data || []); })
+         .catch(() => {});
+      return () => { mounted = false; };
+   }, []);
 
   return (
     <main className="flex-1 bg-surface py-12 md:py-20">
@@ -38,8 +48,8 @@ export default function CartPage() {
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
              {/* Cart Items */}
              <div className="lg:col-span-2 space-y-6">
-                {cartItems.map((item) => {
-                  const prod = productsData.find((p) => p.slug === item.slug);
+                        {cartItems.map((item) => {
+                           const prod = productsData.find((p) => p.slug === item.slug);
                   const displayName = language === 'ta' && prod?.name_ta ? prod.name_ta : item.name;
 
                   return (

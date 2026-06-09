@@ -24,6 +24,9 @@ export default function AdminLayout({
           <Link href="/admin/products" className="px-4 py-3 rounded-lg text-neutral-600 font-medium hover:bg-neutral-50 hover:text-primary transition-colors">
             Manage Products
           </Link>
+          <Link href="/admin/inventory/dashboard" className="px-4 py-3 rounded-lg text-neutral-600 font-medium hover:bg-neutral-50 hover:text-primary transition-colors">
+            Inventory
+          </Link>
           <Link href="/admin/settings" className="px-4 py-3 rounded-lg text-neutral-600 font-medium hover:bg-neutral-50 hover:text-primary transition-colors">
             QR & Settings
           </Link>
@@ -51,6 +54,7 @@ export default function AdminLayout({
             <Link href="/admin" className="px-4 py-2 bg-neutral-100 rounded-full whitespace-nowrap font-bold text-sm">Overview</Link>
             <Link href="/admin/orders" className="px-4 py-2 bg-neutral-100 rounded-full whitespace-nowrap font-bold text-sm">Orders</Link>
             <Link href="/admin/products" className="px-4 py-2 bg-neutral-100 rounded-full whitespace-nowrap font-bold text-sm">Products</Link>
+              <Link href="/admin/inventory/dashboard" className="px-4 py-2 bg-neutral-100 rounded-full whitespace-nowrap font-bold text-sm">Inventory</Link>
             <Link href="/admin/settings" className="px-4 py-2 bg-neutral-100 rounded-full whitespace-nowrap font-bold text-sm">Settings</Link>
             <button 
                onClick={async () => {

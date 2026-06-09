@@ -47,7 +47,6 @@ export default function AdminProductsPage() {
   };
 
   const handleSaveProduct = async (id: number) => {
-    // 1. Upload new image if exists
     let newImageUrl = null;
     if (formFile) {
        const fd = new FormData();
@@ -62,7 +61,6 @@ export default function AdminProductsPage() {
        }
     }
 
-    // 2. Update DB
     const payload: any = {
       id,
       name: formName,
@@ -85,13 +83,33 @@ export default function AdminProductsPage() {
     }
   };
 
+  const handleDeleteProduct = async (id: number) => {
+    if (!confirm('Delete this product? This cannot be undone.')) return;
+    try {
+      await fetch('/api/admin/products', { method: 'DELETE', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id }) });
+      fetchProducts();
+    } catch (e) {
+      alert('Failed to delete product');
+    }
+  };
+
+  const handleRemoveImage = async (id: number) => {
+    if (!confirm('Remove product image?')) return;
+    try {
+      const res = await fetch('/api/admin/products/image', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id }) });
+      const j = await res.json();
+      if (j.success) fetchProducts(); else alert('Failed to remove image');
+    } catch (e) {
+      alert('Failed to remove image');
+    }
+  };
+
   const handleAddNewProduct = async () => {
     if (!formFile || !formName || !formPrice || !newSlug || !newSizes) {
       alert("Please fill all fields, include sizes, and upload an image!");
       return;
     }
 
-    // 1. Upload Image
     const fd = new FormData();
     fd.append('file', formFile);
     const uploadRes = await fetch('/api/admin/upload', { method: 'POST', body: fd });
@@ -102,7 +120,6 @@ export default function AdminProductsPage() {
       return;
     }
 
-    // 2. Add to DB
     const parsedSizes = newSizes.split(',').map((s) => s.trim()).filter(Boolean);
 
     const payload = {
@@ -243,9 +260,13 @@ export default function AdminProductsPage() {
                         </div>
                      </div>
                      <p className="text-xl font-extrabold text-secondary mt-2 mb-4">₹{product.price} <span className="text-sm text-neutral-400 font-normal">/ 1L</span></p>
-                     <button onClick={() => handleEditClick(product)} className="w-full py-2 bg-primary/10 text-primary font-bold rounded-lg hover:bg-primary/20 transition-colors">
-                       Edit Product Details
-                     </button>
+                     <div className="flex gap-2">
+                       <button onClick={() => handleEditClick(product)} className="flex-1 py-2 bg-primary/10 text-primary font-bold rounded-lg hover:bg-primary/20 transition-colors">
+                         Edit
+                       </button>
+                       <button onClick={() => handleRemoveImage(product.id)} className="px-3 py-2 bg-yellow-100 text-yellow-700 font-bold rounded-lg hover:bg-yellow-200 transition">Remove Image</button>
+                       <button onClick={() => handleDeleteProduct(product.id)} className="px-3 py-2 bg-red-100 text-red-700 font-bold rounded-lg hover:bg-red-200 transition">Delete</button>
+                     </div>
                    </div>
                  </>
                )}

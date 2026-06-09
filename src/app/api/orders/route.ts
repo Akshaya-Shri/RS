@@ -3,6 +3,20 @@ import fs from 'fs';
 import path from 'path';
 
 const ORDERS_FILE = path.join(process.cwd(), 'src/data/orders.json');
+const PRODUCTS_FILE = path.join(process.cwd(), 'src/data/products.json');
+
+function readProducts() {
+  try {
+    const data = fs.readFileSync(PRODUCTS_FILE, 'utf8');
+    return JSON.parse(data);
+  } catch (error) {
+    return [];
+  }
+}
+
+function writeProducts(products: any[]) {
+  fs.writeFileSync(PRODUCTS_FILE, JSON.stringify(products, null, 2), 'utf8');
+}
 
 // Helper function to read orders
 function readOrders() {
@@ -71,6 +85,41 @@ export async function POST(req: Request) {
       }))
     };
 
+    // Reserve stock for each item to prevent overselling
+    const products = readProducts();
+    for (const item of newOrder.items) {
+      const prod = products.find((p: any) => p.id === item.product_id);
+      if (!prod) {
+        return NextResponse.json({ success: false, message: `Product ${item.product_id} not found` }, { status: 400 });
+      }
+
+      // Ensure inventory fields exist
+      prod.stock = typeof prod.stock === 'number' ? prod.stock : 0;
+      prod.reserved = typeof prod.reserved === 'number' ? prod.reserved : 0;
+      prod.backorder_allowed = !!prod.backorder_allowed;
+
+      const available = prod.stock - prod.reserved;
+      if (item.quantity > available && !prod.backorder_allowed) {
+        return NextResponse.json({ success: false, message: `Insufficient stock for ${prod.name || prod.id}` }, { status: 409 });
+      }
+
+      // Reserve (if available) or allow backorder (do not reserve)
+      if (item.quantity <= available) {
+        prod.reserved += item.quantity;
+        // update stock_status
+        const lowThreshold = typeof prod.low_stock_threshold === 'number' ? prod.low_stock_threshold : 0;
+        prod.stock_status = (prod.stock - prod.reserved) <= 0 ? 'out_of_stock' : ((prod.stock - prod.reserved) <= lowThreshold ? 'low' : 'in_stock');
+      } else {
+        // backorder: increment incoming or leave reserved unchanged
+        prod.incoming = (typeof prod.incoming === 'number' ? prod.incoming : 0) + item.quantity;
+        prod.stock_status = 'backorder';
+      }
+    }
+
+    // persist product reservations
+    writeProducts(products);
+
+    // persist order after stock reserved
     orders.push(newOrder);
     writeOrders(orders);
 

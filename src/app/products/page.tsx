@@ -1,4 +1,5 @@
 import Link from 'next/link';
+export const dynamic = 'force-dynamic';
 import fs from 'fs';
 import path from 'path';
 import ProductsClient from './ProductsClient';

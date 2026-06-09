@@ -4,17 +4,23 @@ import OilPourHeroSVG from '@/components/ui/OilPourHeroSVG';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useLanguage } from '@/context/LanguageContext';
+import { useEffect, useState } from 'react';
 
 export default function Home() {
   const { t } = useLanguage();
+    const [products, setProducts] = useState<any[]>([]);
 
-  const categories = [
-    { nameKey: 'home.groundnutOil', type: 'groundnut' as const, slug: 'groundnut', color: 'bg-orange-50', imageUrl: '/images/Oilimages/groundnutoil.png' },
-    { nameKey: 'home.coconutOil', type: 'coconut' as const, slug: 'coconut', color: 'bg-amber-50', imageUrl: '/images/Oilimages/cocunutoil.png' },
-    { nameKey: 'home.sesameOil', type: 'sesame' as const, slug: 'sesame', color: 'bg-green-50', imageUrl: '/images/Oilimages/sesameoil.png' },
-    { nameKey: 'home.castorOil', type: 'castor' as const, slug: 'castor', color: 'bg-purple-50', imageUrl: '/images/Oilimages/castoroil.png' },
-    { nameKey: 'home.deepamOil', type: 'deepam' as const, slug: 'deepam', color: 'bg-red-50', imageUrl: '/images/Oilimages/deepamoil.png' },
-  ];
+  useEffect(() => {
+    let mounted = true;
+      fetch('/api/products')
+        .then(r => r.json())
+        .then(j => { if (mounted && j.success) setProducts(j.data || []); })
+      .catch(() => {});
+    return () => { mounted = false; };
+  }, []);
+
+  // featured products are fetched from /api/products and stored in `featured`
+    // products are fetched from /api/products and stored in `products`
 
   const features = [
     { 
@@ -85,27 +91,47 @@ export default function Home() {
         <div className="absolute inset-0 z-0 opacity-[0.03] pointer-events-none" style={{ backgroundImage: 'radial-gradient(#1B5E20 2px, transparent 2px)', backgroundSize: '30px 30px' }}></div>
       </section>
 
-      {/* Categories Section */}
+      
+
+      {/* Our Pure Oils — render products only from the products list */}
       <section className="py-20 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center max-w-2xl mx-auto mb-16">
             <h2 className="text-3xl font-bold text-primary mb-4">{t('home.ourPureOils')}</h2>
             <p className="text-neutral-600 font-inter">{t('home.ourPureOilsDesc')}</p>
           </div>
-          
-          <div className="grid grid-cols-2 lg:grid-cols-5 gap-6">
-            {categories.map((cat) => (
-              <Link key={cat.slug} href={`/products?category=${cat.slug}`} className="group flex flex-col items-center lift-effect">
-                <div className={`w-32 h-32 rounded-full ${cat.color} border-4 border-white shadow-md flex items-center justify-center relative overflow-hidden`}>
-                   <div className="absolute inset-0 bg-secondary/10 opacity-0 group-hover:opacity-100 transition-opacity z-10" />
-                   <Image src={cat.imageUrl} alt={t(cat.nameKey)} fill className="object-cover p-2" />
-                </div>
-                <h3 className="mt-4 font-bold text-foreground group-hover:text-primary transition-colors text-center">{t(cat.nameKey)}</h3>
-              </Link>
-            ))}
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-6">
+            {(() => {
+              // derive unique categories/types from featured products to avoid repeating the same products
+              const seen = new Set<string>();
+              const cats: any[] = [];
+              for (const p of products) {
+                const key = (p.category || p.type || '').toString();
+                if (!key) continue;
+                if (!seen.has(key)) {
+                  seen.add(key);
+                  cats.push(p);
+                }
+              }
+              // fallback: if no categories found, show up to 5 featured products
+              const toShow = cats.length > 0 ? cats.slice(0, 5) : products.slice(0, 5);
+              return toShow.map((product) => (
+                <Link key={product.id} href={`/products?category=${encodeURIComponent(product.category || product.type || '')}`} className="group flex flex-col items-center lift-effect">
+                  <div className="w-32 h-32 rounded-full bg-white border-4 border-white shadow-md flex items-center justify-center relative overflow-hidden">
+                     <div className="absolute inset-0 bg-secondary/10 opacity-0 group-hover:opacity-100 transition-opacity z-10" />
+                     <Image src={product.imageUrl || '/images/Oilimages/groundnutoil.png'} alt={product.name} fill className="object-cover p-2" />
+                  </div>
+                  <h3 className="mt-4 font-bold text-foreground group-hover:text-primary transition-colors text-center">{product.category || product.type || product.name}</h3>
+                </Link>
+              ));
+            })()}
           </div>
         </div>
       </section>
+
+      {/* Featured grid (small) */}
+      
 
       {/* Why Choose Us */}
       <section className="py-20 bg-primary/5">

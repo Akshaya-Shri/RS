@@ -8,7 +8,11 @@ import { useLanguage } from '@/context/LanguageContext';
 export default function ProductDetailClient({ product }: { product: any }) {
   const { t, language } = useLanguage();
 
-  const isAvailable = product.available !== false;
+  const isAvailable = product?.available !== false;
+
+  const benefits: string[] = (language === 'ta' && product?.benefits_ta)
+    ? product.benefits_ta
+    : (product?.benefits ?? []);
 
   return (
     <main className="flex-1 bg-surface py-12">
@@ -59,7 +63,7 @@ export default function ProductDetailClient({ product }: { product: any }) {
                     {t('products.keyBenefits') || 'Key Benefits'}
                  </h3>
                  <ul className="list-disc list-inside text-neutral-600 space-y-1 ml-2 font-inter">
-                   {((language === 'ta' && product.benefits_ta) ? product.benefits_ta : product.benefits).map((b: string, i: number) => <li key={i}>{b}</li>)}
+                   {benefits.length > 0 ? benefits.map((b: string, i: number) => <li key={i}>{b}</li>) : <li>{t('products.noBenefits') || 'No benefits available.'}</li>}
                  </ul>
                </div>
 
