@@ -18,4 +18,5 @@ if (process.env.NODE_ENV !== 'production') {
   global._pgPool = pool;
 }
 
+export { pool };
 export default pool;
