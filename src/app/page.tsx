@@ -1,6 +1,6 @@
 'use client';
 
-import OilPourHeroSVG from '@/components/ui/OilPourHeroSVG';
+import VideoPlayer from '@/components/VideoPlayer';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useLanguage } from '@/context/LanguageContext';
@@ -83,7 +83,14 @@ export default function Home() {
             </div>
             
             <div className="relative h-[400px] lg:h-[600px] flex items-center justify-center">
-               <OilPourHeroSVG className="max-w-md" />
+               <VideoPlayer
+                 src="/videos/RS.mp4"
+                 poster="/images/video-poster.jpg"
+                 muted
+                 loop
+                 className="max-w-full h-full object-cover rounded-lg shadow-lg"
+                 style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+               />
             </div>
           </div>
         </div>
