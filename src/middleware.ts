@@ -5,8 +5,8 @@ export function middleware(request: NextRequest) {
   // If user is trying to access an admin page
   if (request.nextUrl.pathname.startsWith('/admin')) {
     
-    // Allow the login page itself to be accessed
-    if (request.nextUrl.pathname === '/admin/login') {
+    // Allow the login page itself to be accessed (handle trailing slash)
+    if (request.nextUrl.pathname.startsWith('/admin/login')) {
       return NextResponse.next();
     }
 
@@ -20,7 +20,7 @@ export function middleware(request: NextRequest) {
   }
 
   // Also protect admin API routes from unauthorized external calls
-  if (request.nextUrl.pathname.startsWith('/api/admin') && request.nextUrl.pathname !== '/api/admin/login') {
+  if (request.nextUrl.pathname.startsWith('/api/admin') && !request.nextUrl.pathname.startsWith('/api/admin/login')) {
     const authCookie = request.cookies.get('revathi_admin_auth');
     if (authCookie?.value !== 'authenticated') {
       return NextResponse.json({ success: false, message: 'Unauthorized access' }, { status: 401 });
