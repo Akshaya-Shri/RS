@@ -1,50 +1,10 @@
 import { NextResponse } from 'next/server';
-import fs from 'fs';
-import path from 'path';
-const PRODUCTS_FILE = path.join(process.cwd(), 'src/data/products.json');
-
-function readProducts() {
-  try {
-    const data = fs.readFileSync(PRODUCTS_FILE, 'utf8');
-    return JSON.parse(data);
-  } catch (error) {
-    return [];
-  }
-}
-
-function writeProducts(products: any[]) {
-  fs.writeFileSync(PRODUCTS_FILE, JSON.stringify(products, null, 2), 'utf8');
-}
-
-function defaultInventory() {
-  return {
-    sku: '',
-    barcode: '',
-    stock: 0,
-    reserved: 0,
-    incoming: 0,
-    min_stock: 0,
-    reorder_qty: 0,
-    backorder_allowed: false,
-    locations: [],
-    variants: [],
-    batches: [],
-    cost_price: 0,
-    last_cost: 0,
-    unit: null,
-    pack_size: null,
-    supplierId: null,
-    leadTimeDays: null,
-    low_stock_threshold: 0,
-    stock_status: 'in_stock',
-    stock_updated_at: null
-  };
-}
+import { pool } from '@/lib/db';
 
 export async function GET() {
   try {
-    const products = readProducts();
-    return NextResponse.json({ success: true, data: products });
+    const res = await pool.query('SELECT *, type AS category FROM products ORDER BY id ASC');
+    return NextResponse.json({ success: true, data: res.rows });
   } catch (error) {
     console.error('Failed to read products:', error);
     return NextResponse.json({ success: false, message: 'Failed to fetch products' }, { status: 500 });
@@ -54,52 +14,63 @@ export async function GET() {
 export async function POST(req: Request) {
   try {
     const payload = await req.json();
-    const products = readProducts();
-    const nextId = products.reduce((max: number, p: any) => Math.max(max, p.id || 0), 0) + 1;
+    const type = payload.category || payload.type || 'general';
 
-    const newProduct = {
-      id: nextId,
-      name: payload.name || 'Untitled',
-      price: payload.price || 0,
-      category: payload.category || 'general',
-      slug: payload.slug || `product-${nextId}`,
-      imageUrl: payload.imageUrl || '/images/Oilimages/groundnutoil.png',
-      sizes: payload.sizes || [],
-      description: payload.description || '',
-      available: payload.available ?? true
-    };
+    const insertQuery = `
+      INSERT INTO products (
+        name, name_ta, description, description_ta, type, slug, 
+        "imageUrl", price, sizes, available, benefits, benefits_ta, 
+        "usage", usage_ta, sku, barcode, stock, reserved, incoming, 
+        min_stock, reorder_qty, backorder_allowed, locations, 
+        variants, batches, cost_price, last_cost, unit, 
+        "pack_size", "supplierId", "leadTimeDays", 
+        low_stock_threshold, stock_status, stock_updated_at
+      ) VALUES (
+        $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14,
+        $15, $16, $17, $18, $19, $20, $21, $22, $23, $24, $25, $26,
+        $27, $28, $29, $30, $31, $32, $33, $34
+      ) RETURNING *, type AS category
+    `;
 
-    // attach inventory defaults and allow overrides from payload
-    const inventoryDefaults = defaultInventory();
-    const inventoryFromPayload = {
-      sku: payload.sku ?? inventoryDefaults.sku,
-      barcode: payload.barcode ?? inventoryDefaults.barcode,
-      stock: payload.stock ?? inventoryDefaults.stock,
-      reserved: payload.reserved ?? inventoryDefaults.reserved,
-      incoming: payload.incoming ?? inventoryDefaults.incoming,
-      min_stock: payload.min_stock ?? inventoryDefaults.min_stock,
-      reorder_qty: payload.reorder_qty ?? inventoryDefaults.reorder_qty,
-      backorder_allowed: payload.backorder_allowed ?? inventoryDefaults.backorder_allowed,
-      locations: payload.locations ?? inventoryDefaults.locations,
-      variants: payload.variants ?? inventoryDefaults.variants,
-      batches: payload.batches ?? inventoryDefaults.batches,
-      cost_price: payload.cost_price ?? inventoryDefaults.cost_price,
-      last_cost: payload.last_cost ?? inventoryDefaults.last_cost,
-      unit: payload.unit ?? inventoryDefaults.unit,
-      pack_size: payload.pack_size ?? inventoryDefaults.pack_size,
-      supplierId: payload.supplierId ?? inventoryDefaults.supplierId,
-      leadTimeDays: payload.leadTimeDays ?? inventoryDefaults.leadTimeDays,
-      low_stock_threshold: payload.low_stock_threshold ?? inventoryDefaults.low_stock_threshold,
-      stock_status: payload.stock_status ?? inventoryDefaults.stock_status,
-      stock_updated_at: payload.stock_updated_at ?? inventoryDefaults.stock_updated_at
-    };
+    const values = [
+      payload.name || 'Untitled',
+      payload.name_ta || null,
+      payload.description || '',
+      payload.description_ta || null,
+      type,
+      payload.slug || `product-${Date.now()}`,
+      payload.imageUrl || '/images/Oilimages/groundnutoil.png',
+      payload.price || 0,
+      payload.sizes || [],
+      payload.available ?? true,
+      payload.benefits || [],
+      payload.benefits_ta || [],
+      payload.usage || null,
+      payload.usage_ta || null,
+      payload.sku || '',
+      payload.barcode || '',
+      payload.stock || 0,
+      payload.reserved || 0,
+      payload.incoming || 0,
+      payload.min_stock || 0,
+      payload.reorder_qty || 0,
+      payload.backorder_allowed ?? false,
+      JSON.stringify(payload.locations || []),
+      JSON.stringify(payload.variants || []),
+      JSON.stringify(payload.batches || []),
+      payload.cost_price || 0,
+      payload.last_cost || 0,
+      payload.unit || 'ml',
+      payload.pack_size || null,
+      payload.supplierId || null,
+      payload.leadTimeDays || 7,
+      payload.low_stock_threshold || 0,
+      payload.stock_status || 'in_stock',
+      payload.stock_updated_at ? new Date(payload.stock_updated_at) : null
+    ];
 
-    Object.assign(newProduct, inventoryFromPayload);
-
-    products.unshift(newProduct);
-    writeProducts(products);
-
-    return NextResponse.json({ success: true, data: newProduct }, { status: 201 });
+    const result = await pool.query(insertQuery, values);
+    return NextResponse.json({ success: true, data: result.rows[0] }, { status: 201 });
   } catch (error) {
     console.error('Failed to create product:', error);
     return NextResponse.json({ success: false, message: 'Failed to create product' }, { status: 500 });
@@ -112,14 +83,96 @@ export async function PUT(req: Request) {
     const { id } = payload;
     if (!id) return NextResponse.json({ success: false, message: 'Product id required' }, { status: 400 });
 
-    const products = readProducts();
-    const idx = products.findIndex((p: any) => p.id === id);
-    if (idx === -1) return NextResponse.json({ success: false, message: 'Product not found' }, { status: 404 });
+    // Fetch existing product to merge partial updates safely
+    const existing = await pool.query('SELECT * FROM products WHERE id = $1', [id]);
+    if (existing.rowCount === 0) {
+      return NextResponse.json({ success: false, message: 'Product not found' }, { status: 404 });
+    }
+    const current = existing.rows[0];
+    const merged = { ...current, ...payload };
 
-    products[idx] = { ...products[idx], ...payload };
-    writeProducts(products);
+    const type = merged.category || merged.type;
 
-    return NextResponse.json({ success: true, data: products[idx] });
+    const updateQuery = `
+      UPDATE products SET
+        name = $1,
+        name_ta = $2,
+        description = $3,
+        description_ta = $4,
+        type = $5,
+        slug = $6,
+        "imageUrl" = $7,
+        price = $8,
+        sizes = $9,
+        available = $10,
+        benefits = $11,
+        benefits_ta = $12,
+        "usage" = $13,
+        usage_ta = $14,
+        sku = $15,
+        barcode = $16,
+        stock = $17,
+        reserved = $18,
+        incoming = $19,
+        min_stock = $20,
+        reorder_qty = $21,
+        backorder_allowed = $22,
+        locations = $23,
+        variants = $24,
+        batches = $25,
+        cost_price = $26,
+        last_cost = $27,
+        unit = $28,
+        "pack_size" = $29,
+        "supplierId" = $30,
+        "leadTimeDays" = $31,
+        low_stock_threshold = $32,
+        stock_status = $33,
+        stock_updated_at = $34
+      WHERE id = $35
+      RETURNING *, type AS category
+    `;
+
+    const values = [
+      merged.name,
+      merged.name_ta || null,
+      merged.description,
+      merged.description_ta || null,
+      type,
+      merged.slug,
+      merged.imageUrl,
+      merged.price,
+      merged.sizes,
+      merged.available ?? true,
+      merged.benefits || [],
+      merged.benefits_ta || [],
+      merged.usage || null,
+      merged.usage_ta || null,
+      merged.sku || '',
+      merged.barcode || '',
+      merged.stock || 0,
+      merged.reserved || 0,
+      merged.incoming || 0,
+      merged.min_stock || 0,
+      merged.reorder_qty || 0,
+      merged.backorder_allowed ?? false,
+      typeof merged.locations === 'string' ? merged.locations : JSON.stringify(merged.locations || []),
+      typeof merged.variants === 'string' ? merged.variants : JSON.stringify(merged.variants || []),
+      typeof merged.batches === 'string' ? merged.batches : JSON.stringify(merged.batches || []),
+      merged.cost_price || 0,
+      merged.last_cost || 0,
+      merged.unit || 'ml',
+      merged.pack_size || null,
+      merged.supplierId || null,
+      merged.leadTimeDays || 7,
+      merged.low_stock_threshold || 0,
+      merged.stock_status || 'in_stock',
+      merged.stock_updated_at ? new Date(merged.stock_updated_at) : null,
+      id
+    ];
+
+    const result = await pool.query(updateQuery, values);
+    return NextResponse.json({ success: true, data: result.rows[0] });
   } catch (error) {
     console.error('Failed to update product:', error);
     return NextResponse.json({ success: false, message: 'Failed to update product' }, { status: 500 });
@@ -131,10 +184,10 @@ export async function DELETE(req: Request) {
     const { id } = await req.json();
     if (!id) return NextResponse.json({ success: false, message: 'Product id required' }, { status: 400 });
 
-    const products = readProducts();
-    const updated = products.filter((p: any) => p.id !== id);
-    writeProducts(updated);
-
+    const result = await pool.query('DELETE FROM products WHERE id = $1', [id]);
+    if (result.rowCount === 0) {
+      return NextResponse.json({ success: false, message: 'Product not found' }, { status: 404 });
+    }
     return NextResponse.json({ success: true });
   } catch (error) {
     console.error('Failed to delete product:', error);

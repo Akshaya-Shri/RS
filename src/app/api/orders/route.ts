@@ -1,40 +1,8 @@
 import { NextResponse } from 'next/server';
-import fs from 'fs';
-import path from 'path';
-
-const ORDERS_FILE = path.join(process.cwd(), 'src/data/orders.json');
-const PRODUCTS_FILE = path.join(process.cwd(), 'src/data/products.json');
-
-function readProducts() {
-  try {
-    const data = fs.readFileSync(PRODUCTS_FILE, 'utf8');
-    return JSON.parse(data);
-  } catch (error) {
-    return [];
-  }
-}
-
-function writeProducts(products: any[]) {
-  fs.writeFileSync(PRODUCTS_FILE, JSON.stringify(products, null, 2), 'utf8');
-}
-
-// Helper function to read orders
-function readOrders() {
-  try {
-    const data = fs.readFileSync(ORDERS_FILE, 'utf8');
-    return JSON.parse(data);
-  } catch (error) {
-    // If file doesn't exist, return empty array
-    return [];
-  }
-}
-
-// Helper function to write orders
-function writeOrders(orders: any[]) {
-  fs.writeFileSync(ORDERS_FILE, JSON.stringify(orders, null, 2), 'utf8');
-}
+import { pool } from '@/lib/db';
 
 export async function POST(req: Request) {
+  const client = await pool.connect();
   try {
     const {
       customer_name,
@@ -55,75 +23,103 @@ export async function POST(req: Request) {
       return NextResponse.json({ success: false, message: 'Missing required fields' }, { status: 400 });
     }
 
-    const orders = readOrders();
+    await client.query('BEGIN');
 
-    // Generate new order ID
-    const maxId = orders.reduce((max: number, order: any) => Math.max(max, order.id || 0), 0);
-    const orderId = maxId + 1;
+    // 1. Process items and update stock levels in DB
+    const processedItems: any[] = [];
+    for (const item of items) {
+      // Lock product row for safe inventory checking/updating
+      const prodRes = await client.query(
+        'SELECT id, name, stock, reserved, incoming, backorder_allowed, low_stock_threshold, stock_status FROM products WHERE id = $1 FOR UPDATE',
+        [item.product_id]
+      );
 
-    // Create order object
-    const newOrder = {
-      id: orderId,
-      customer_name,
-      customer_phone,
-      customer_email: customer_email || null,
-      address,
-      city,
-      state,
-      pincode,
-      transaction_id,
-      payment_img_url,
-      total_amount,
-      status: 'pending',
-      created_at: new Date().toISOString(),
-      items: items.map((item: any, index: number) => ({
-        id: index + 1,
+      if (prodRes.rowCount === 0) {
+        await client.query('ROLLBACK');
+        return NextResponse.json({ success: false, message: `Product ${item.product_id} not found` }, { status: 400 });
+      }
+
+      const prod = prodRes.rows[0];
+      const stock = typeof prod.stock === 'number' ? prod.stock : 0;
+      const reserved = typeof prod.reserved === 'number' ? prod.reserved : 0;
+      const incoming = typeof prod.incoming === 'number' ? prod.incoming : 0;
+      const backorder_allowed = !!prod.backorder_allowed;
+
+      const available = stock - reserved;
+      if (item.quantity > available && !backorder_allowed) {
+        await client.query('ROLLBACK');
+        return NextResponse.json({ success: false, message: `Insufficient stock for ${prod.name || prod.id}` }, { status: 409 });
+      }
+
+      let newReserved = reserved;
+      let newIncoming = incoming;
+      let stock_status = prod.stock_status;
+
+      if (item.quantity <= available) {
+        newReserved += item.quantity;
+        // update stock_status
+        const lowThreshold = typeof prod.low_stock_threshold === 'number' ? prod.low_stock_threshold : 0;
+        const availableAfter = stock - newReserved;
+        stock_status = availableAfter <= 0 ? 'out_of_stock' : (availableAfter <= lowThreshold ? 'low' : 'in_stock');
+      } else {
+        // backorder: increment incoming
+        newIncoming += item.quantity;
+        stock_status = 'backorder';
+      }
+
+      // Update product inventory in DB
+      await client.query(`
+        UPDATE products SET
+          reserved = $1,
+          incoming = $2,
+          stock_status = $3,
+          stock_updated_at = NOW()
+        WHERE id = $4
+      `, [newReserved, newIncoming, stock_status, item.product_id]);
+
+      processedItems.push({
         product_id: item.product_id,
         size: item.size,
         quantity: item.quantity,
         price: item.price
-      }))
-    };
-
-    // Reserve stock for each item to prevent overselling
-    const products = readProducts();
-    for (const item of newOrder.items) {
-      const prod = products.find((p: any) => p.id === item.product_id);
-      if (!prod) {
-        return NextResponse.json({ success: false, message: `Product ${item.product_id} not found` }, { status: 400 });
-      }
-
-      // Ensure inventory fields exist
-      prod.stock = typeof prod.stock === 'number' ? prod.stock : 0;
-      prod.reserved = typeof prod.reserved === 'number' ? prod.reserved : 0;
-      prod.backorder_allowed = !!prod.backorder_allowed;
-
-      const available = prod.stock - prod.reserved;
-      if (item.quantity > available && !prod.backorder_allowed) {
-        return NextResponse.json({ success: false, message: `Insufficient stock for ${prod.name || prod.id}` }, { status: 409 });
-      }
-
-      // Reserve (if available) or allow backorder (do not reserve)
-      if (item.quantity <= available) {
-        prod.reserved += item.quantity;
-        // update stock_status
-        const lowThreshold = typeof prod.low_stock_threshold === 'number' ? prod.low_stock_threshold : 0;
-        prod.stock_status = (prod.stock - prod.reserved) <= 0 ? 'out_of_stock' : ((prod.stock - prod.reserved) <= lowThreshold ? 'low' : 'in_stock');
-      } else {
-        // backorder: increment incoming or leave reserved unchanged
-        prod.incoming = (typeof prod.incoming === 'number' ? prod.incoming : 0) + item.quantity;
-        prod.stock_status = 'backorder';
-      }
+      });
     }
 
-    // persist product reservations
-    writeProducts(products);
+    // 2. Insert order record
+    const orderRes = await client.query(`
+      INSERT INTO orders (
+        total_amount, status, payment_img_url, transaction_id, created_at,
+        customer_name, customer_phone, customer_email, address, city, state, pincode
+      ) VALUES ($1, $2, $3, $4, NOW(), $5, $6, $7, $8, $9, $10, $11)
+      RETURNING id
+    `, [
+      total_amount,
+      'pending',
+      payment_img_url || null,
+      transaction_id,
+      customer_name,
+      customer_phone,
+      customer_email || null,
+      address,
+      city,
+      state,
+      pincode
+    ]);
 
-    // persist order after stock reserved
-    orders.push(newOrder);
-    writeOrders(orders);
+    const orderId = orderRes.rows[0].id;
 
-    // Send notification (SMS if configured, otherwise WhatsApp)
+    // 3. Insert order items
+    for (const item of processedItems) {
+      await client.query(`
+        INSERT INTO order_items (
+          order_id, product_id, size, quantity, price
+        ) VALUES ($1, $2, $3, $4, $5)
+      `, [orderId, item.product_id, item.size, item.quantity, item.price]);
+    }
+
+    await client.query('COMMIT');
+
+    // 4. Send notifications outside of transaction context
     const notifyPath = process.env.SMS_PROVIDER ? '/api/notify/sms' : '/api/notify/whatsapp';
     try {
       await fetch(`${process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'}${notifyPath}`, {
@@ -141,7 +137,6 @@ export async function POST(req: Request) {
       }).catch(err => console.error('Notification failed:', err));
     } catch (notifyError) {
       console.error('Failed to send notification:', notifyError);
-      // Don't fail the order creation if notification fails
     }
 
     return NextResponse.json({
@@ -149,7 +144,10 @@ export async function POST(req: Request) {
       data: { orderId, message: 'Order placed successfully' }
     });
   } catch (error) {
+    await client.query('ROLLBACK');
     console.error('Order creation error:', error);
     return NextResponse.json({ success: false, message: 'Failed to create order' }, { status: 500 });
+  } finally {
+    client.release();
   }
 }

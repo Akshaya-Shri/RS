@@ -1,6 +1,5 @@
-import fs from 'fs';
-import path from 'path';
 import { notFound } from 'next/navigation';
+import { pool } from '@/lib/db';
 import ProductDetailClient from './ProductDetailClient';
 
 export const dynamic = 'force-dynamic';
@@ -15,11 +14,18 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
 export default async function ProductDetailPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
 
-  const filePath = path.join(process.cwd(), 'src/data/products.json');
-  const fileContents = fs.readFileSync(filePath, 'utf8');
-  const products = JSON.parse(fileContents);
-  
-  const product = products.find((p: any) => p.slug === slug);
+  let product = null;
+  try {
+    const res = await pool.query(
+      'SELECT *, type AS category FROM products WHERE slug = $1 LIMIT 1',
+      [slug]
+    );
+    if (res.rowCount > 0) {
+      product = res.rows[0];
+    }
+  } catch (err) {
+    console.error('Failed to query product details from DB:', err);
+  }
 
   if (!product) {
     notFound();

@@ -1,23 +1,17 @@
 import { NextResponse } from 'next/server';
-import fs from 'fs';
-import path from 'path';
-
-const PRODUCTS_FILE = path.join(process.cwd(), 'src/data/products.json');
-
-function readProducts() {
-  try {
-    const data = fs.readFileSync(PRODUCTS_FILE, 'utf8');
-    return JSON.parse(data);
-  } catch (error) {
-    return [];
-  }
-}
+import { pool } from '@/lib/db';
 
 export async function GET(req: Request) {
   try {
-    const products = readProducts();
+    const res = await pool.query(`
+      SELECT 
+        id, name, sku, barcode, stock, reserved, incoming, 
+        stock_status, low_stock_threshold, locations, variants, "imageUrl"
+      FROM products
+      ORDER BY id ASC
+    `);
 
-    const summary = products.map((p: any) => ({
+    const summary = res.rows.map((p: any) => ({
       id: p.id,
       name: p.name,
       sku: p.sku ?? '',
