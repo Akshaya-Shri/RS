@@ -73,11 +73,10 @@ export async function PUT(req: Request) {
         const reserved = typeof prod.reserved === 'number' ? prod.reserved : 0;
         const qty = item.quantity || 0;
 
-        // Deduct from reserved first, then from stock if reserved insufficient
+        // Deduct quantity from total stock, and deduct the corresponding reserved portion
         const reservedDeduct = Math.min(reserved, qty);
-        const newReserved = reserved - reservedDeduct;
-        const remaining = qty - reservedDeduct;
-        const newStock = Math.max(0, stock - remaining);
+        const newReserved = Math.max(0, reserved - reservedDeduct);
+        const newStock = Math.max(0, stock - qty);
 
         // Update stock status
         const lowThreshold = typeof prod.low_stock_threshold === 'number' ? prod.low_stock_threshold : 0;
