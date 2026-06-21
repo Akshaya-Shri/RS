@@ -34,7 +34,7 @@ export default function AdminLayout({
         <div className="p-4 mt-auto border-t border-neutral-200 mt-12">
           <button 
             onClick={async () => {
-              await fetch('/api/admin/login', { method: 'POST', body: JSON.stringify({ action: 'logout' }) });
+              await fetch('/api/admin/logout', { method: 'POST' });
               window.location.href = '/admin/login';
             }}
             className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-red-50 text-red-600 font-bold rounded-lg hover:bg-red-100 transition-colors"
@@ -58,7 +58,7 @@ export default function AdminLayout({
             <Link href="/admin/settings" className="px-4 py-2 bg-neutral-100 rounded-full whitespace-nowrap font-bold text-sm">Settings</Link>
             <button 
                onClick={async () => {
-                 await fetch('/api/admin/login', { method: 'POST', body: JSON.stringify({ action: 'logout' }) });
+                 await fetch('/api/admin/logout', { method: 'POST' });
                  window.location.href = '/admin/login';
                }}
                className="ml-auto px-4 py-2 bg-red-50 text-red-600 rounded-full whitespace-nowrap font-bold text-sm"

@@ -259,6 +259,31 @@ async function runTest() {
       throw new Error(`Reserved stock was not released correctly. Expected ${originalReserved}, got ${shippedProd.reserved}`);
     }
     console.log('✓ Inventory reduction verified in database.');
+
+    // 9. Verify Logout and Token Invalidation
+    console.log('\nStep 9: Testing Admin Logout...');
+    const logoutRes = await fetch(`${BASE_URL}/api/admin/logout`, {
+      method: 'POST',
+      headers: {
+        'Cookie': `revathi_admin_auth=${authCookie}`
+      }
+    });
+    if (!logoutRes.ok) {
+      throw new Error(`Admin logout returned status ${logoutRes.status}`);
+    }
+    const logoutJson = await logoutRes.json();
+    if (!logoutJson.success) {
+      throw new Error('Admin logout failed');
+    }
+    console.log('✓ Logout endpoint returned success.');
+
+    // Verify token is deleted in database
+    const sessionRes = await client.query('SELECT 1 FROM user_sessions WHERE token = $1', [authCookie]);
+    if (sessionRes.rowCount > 0) {
+      throw new Error('Session token was not deleted from database upon logout');
+    }
+    console.log('✓ Session token successfully invalidated in database.');
+
     console.log('\n--- ALL E2E TESTS PASSED ---');
 
   } catch (error) {

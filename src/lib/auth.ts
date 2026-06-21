@@ -1,4 +1,5 @@
 const encoder = new TextEncoder();
+const decoder = new TextDecoder();
 
 function toBase64Url(str: string): string {
   return str.replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
@@ -32,7 +33,13 @@ export interface SessionPayload {
  * Generates a signed session token.
  */
 export async function signSession(payload: SessionPayload, secret: string): Promise<string> {
-  const payloadStr = toBase64Url(btoa(JSON.stringify(payload)));
+  const jsonStr = JSON.stringify(payload);
+  const payloadBytes = encoder.encode(jsonStr);
+  let payloadBinary = '';
+  for (let i = 0; i < payloadBytes.byteLength; i++) {
+    payloadBinary += String.fromCharCode(payloadBytes[i]);
+  }
+  const payloadStr = toBase64Url(btoa(payloadBinary));
   const key = await getCryptoKey(secret);
   const signature = await crypto.subtle.sign(
     'HMAC',
@@ -77,8 +84,13 @@ export async function verifySession(token: string, secret: string): Promise<Sess
     
     if (!isValid) return null;
     
-    // Decode and parse payload
-    const payloadJson = atob(fromBase64Url(payloadStr));
+    // Decode and parse payload safely using TextDecoder for UTF-8
+    const payloadBinary = atob(fromBase64Url(payloadStr));
+    const payloadBytes = new Uint8Array(payloadBinary.length);
+    for (let i = 0; i < payloadBinary.length; i++) {
+      payloadBytes[i] = payloadBinary.charCodeAt(i);
+    }
+    const payloadJson = decoder.decode(payloadBytes);
     const payload = JSON.parse(payloadJson) as SessionPayload;
     
     // Verify expiration

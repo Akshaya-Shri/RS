@@ -8,8 +8,16 @@ export async function middleware(request: NextRequest) {
   // If user is trying to access an admin page
   if (request.nextUrl.pathname.startsWith('/admin')) {
     
-    // Allow the login page itself to be accessed (handle trailing slash)
+    // Check if they are accessing the login page itself (handle trailing slash)
     if (request.nextUrl.pathname.startsWith('/admin/login')) {
+      const authCookie = request.cookies.get('revathi_admin_auth');
+      const session = authCookie ? await verifySession(authCookie.value, ADMIN_JWT_SECRET) : null;
+      
+      // If already logged in, redirect to admin home
+      if (session) {
+        const dashboardUrl = new URL('/admin', request.url);
+        return NextResponse.redirect(dashboardUrl);
+      }
       return NextResponse.next();
     }
 
@@ -25,8 +33,10 @@ export async function middleware(request: NextRequest) {
   }
 
   // Also protect admin API routes from unauthorized external calls
+  // Exclude login and logout endpoints so users can hit them unauthenticated if necessary
   if (request.nextUrl.pathname.startsWith('/api/admin') && 
-      !request.nextUrl.pathname.startsWith('/api/admin/login')) {
+      !request.nextUrl.pathname.startsWith('/api/admin/login') &&
+      !request.nextUrl.pathname.startsWith('/api/admin/logout')) {
     const authCookie = request.cookies.get('revathi_admin_auth');
     const session = authCookie ? await verifySession(authCookie.value, ADMIN_JWT_SECRET) : null;
     
@@ -40,5 +50,6 @@ export async function middleware(request: NextRequest) {
 
 // Only run middleware on admin and API routes to save performance
 export const config = {
-  matcher: ['/admin/:path*', '/api/admin/:path*'],
+  matcher: ['/admin', '/admin/:path*', '/api/admin/:path*'],
 };
+

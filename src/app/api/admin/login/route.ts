@@ -1,41 +1,13 @@
 import { NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
-import { signSession, verifySession } from '@/lib/auth';
+import { signSession } from '@/lib/auth';
 import { pool } from '@/lib/db';
 import bcrypt from 'bcryptjs';
 
 export async function POST(req: Request) {
   try {
-    const { action, username, password } = await req.json();
+    const { username, password } = await req.json();
     const ADMIN_JWT_SECRET = process.env.ADMIN_JWT_SECRET || 'default_super_secret_key_for_revathi_store_admin_portal';
-
-    if (action === 'logout') {
-      const cookieStore = await cookies();
-      const authCookie = cookieStore.get('revathi_admin_auth');
-      if (authCookie) {
-        const token = authCookie.value;
-        const session = await verifySession(token, ADMIN_JWT_SECRET);
-        if (session) {
-          // 1. Delete session from user_sessions table
-          await pool.query('DELETE FROM user_sessions WHERE token = $1', [token]);
-
-          // Get user details
-          const userRes = await pool.query('SELECT id FROM users WHERE name = $1 LIMIT 1', [session.username]);
-          if (userRes.rowCount > 0) {
-            const userId = userRes.rows[0].id;
-            // 2. Log logout action in audit_logs table
-            await pool.query(
-              "INSERT INTO audit_logs (entity_type, entity_id, action, performed_by, data) VALUES ('user', $1, 'logout', $1, $2)",
-              [userId, JSON.stringify({ reason: 'user logout' })]
-            );
-          }
-        }
-      }
-
-      const response = NextResponse.json({ success: true });
-      response.cookies.delete('revathi_admin_auth');
-      return response;
-    }
 
     // Query database for admin user matching name or email and role = 'admin'
     const res = await pool.query(
@@ -69,6 +41,9 @@ export async function POST(req: Request) {
           [user.id, JSON.stringify({ ip_address: ip, user_agent: userAgent })]
         );
 
+        // Database session cleanup: Purge any sessions older than 24 hours
+        await pool.query("DELETE FROM user_sessions WHERE created_at < NOW() - INTERVAL '24 hours'");
+
         // Set secure HTTP-only cookie, expires in 24 hours
         response.cookies.set({
           name: 'revathi_admin_auth',
@@ -86,6 +61,8 @@ export async function POST(req: Request) {
 
     return NextResponse.json({ success: false, message: 'Invalid credentials' }, { status: 401 });
   } catch (error) {
+    console.error('Login route error:', error);
     return NextResponse.json({ success: false, message: 'Server error' }, { status: 500 });
   }
 }
+
