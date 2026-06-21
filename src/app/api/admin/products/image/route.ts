@@ -1,10 +1,14 @@
 import { NextResponse } from 'next/server';
 import { pool } from '@/lib/db';
+import { verifyDbSession } from '@/lib/auth-db';
 import fs from 'fs';
 import path from 'path';
 
 export async function POST(req: Request) {
   try {
+    const session = await verifyDbSession();
+    if (!session) return NextResponse.json({ success: false, message: 'Unauthorized access' }, { status: 401 });
+
     const { id } = await req.json();
     if (!id) return NextResponse.json({ success: false, message: 'Product id required' }, { status: 400 });
 

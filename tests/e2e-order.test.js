@@ -52,6 +52,36 @@ async function runTest() {
   let createdOrderId = null;
 
   try {
+    // 0. Log in as admin to get authentication cookie for admin endpoints
+    console.log('\nStep 0: Logging in as Admin...');
+    const loginRes0 = await fetch(`${BASE_URL}/api/admin/login`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        username: env.ADMIN_USER || 'admin',
+        password: env.ADMIN_PASS || 'admin123'
+      })
+    });
+    if (!loginRes0.ok) {
+      throw new Error(`Admin login returned status ${loginRes0.status}`);
+    }
+    const loginJson0 = await loginRes0.json();
+    if (!loginJson0.success) {
+      throw new Error(`Admin login failed`);
+    }
+    const setCookieHeader0 = loginRes0.headers.get('set-cookie');
+    let authCookie = '';
+    if (setCookieHeader0) {
+      const match = setCookieHeader0.match(/revathi_admin_auth=([^;]+)/);
+      if (match) {
+        authCookie = match[1];
+      }
+    }
+    if (!authCookie) {
+      throw new Error('Failed to retrieve authentication cookie from login response');
+    }
+    console.log('✓ Admin authenticated successfully.');
+
     // 2. Fetch original inventory levels
     console.log(`\nStep 1: Fetching initial inventory levels for product ID: ${productId}`);
     const initialRes = await client.query('SELECT name, stock, reserved, incoming FROM products WHERE id = $1', [productId]);
@@ -68,7 +98,10 @@ async function runTest() {
     console.log('\nStep 2: Uploading payment proof...');
     const uploadRes = await fetch(`${BASE_URL}/api/admin/upload`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 
+        'Content-Type': 'application/json',
+        'Cookie': `revathi_admin_auth=${authCookie}`
+      },
       body: JSON.stringify({
         filename: 'e2e-payment-proof.png',
         data: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg=='
@@ -158,7 +191,6 @@ async function runTest() {
       throw new Error(`Admin login failed`);
     }
     const setCookieHeader = loginRes.headers.get('set-cookie');
-    let authCookie = '';
     if (setCookieHeader) {
       const match = setCookieHeader.match(/revathi_admin_auth=([^;]+)/);
       if (match) {

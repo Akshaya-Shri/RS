@@ -53,7 +53,7 @@ export default function CheckoutPage() {
       formDataUpload.append('file', file);
       formDataUpload.append('isPayment', 'true');
 
-      const uploadRes = await fetch('/api/admin/upload', {
+      const uploadRes = await fetch('/api/orders/upload', {
         method: 'POST',
         body: formDataUpload
       });

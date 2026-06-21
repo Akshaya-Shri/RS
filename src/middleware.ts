@@ -26,8 +26,7 @@ export async function middleware(request: NextRequest) {
 
   // Also protect admin API routes from unauthorized external calls
   if (request.nextUrl.pathname.startsWith('/api/admin') && 
-      !request.nextUrl.pathname.startsWith('/api/admin/login') &&
-      !request.nextUrl.pathname.startsWith('/api/admin/upload')) {
+      !request.nextUrl.pathname.startsWith('/api/admin/login')) {
     const authCookie = request.cookies.get('revathi_admin_auth');
     const session = authCookie ? await verifySession(authCookie.value, ADMIN_JWT_SECRET) : null;
     

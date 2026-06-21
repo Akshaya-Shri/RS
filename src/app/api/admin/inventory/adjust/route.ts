@@ -1,13 +1,18 @@
 import { NextResponse } from 'next/server';
 import { pool } from '@/lib/db';
+import { verifyDbSession } from '@/lib/auth-db';
 
 export async function POST(req: Request) {
+  const session = await verifyDbSession();
+  if (!session) return NextResponse.json({ success: false, message: 'Unauthorized access' }, { status: 401 });
+
   const client = await pool.connect();
   try {
     const payload = await req.json();
     const { product_id, change, type = 'stock', reason = 'manual adjustment', user = 'admin' } = payload;
 
     if (typeof product_id === 'undefined' || typeof change !== 'number') {
+      await client.release();
       return NextResponse.json({ success: false, message: 'product_id and numeric change are required' }, { status: 400 });
     }
 
@@ -72,7 +77,7 @@ export async function POST(req: Request) {
       type,
       change,
       reason,
-      user,
+      session.username || user,
       JSON.stringify(old),
       JSON.stringify({ stock: newStock, reserved: newReserved, incoming: newIncoming }),
       stock_updated_at

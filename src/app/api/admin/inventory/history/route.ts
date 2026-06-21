@@ -1,8 +1,12 @@
 import { NextResponse } from 'next/server';
 import { pool } from '@/lib/db';
+import { verifyDbSession } from '@/lib/auth-db';
 
 export async function GET(req: Request) {
   try {
+    const session = await verifyDbSession();
+    if (!session) return NextResponse.json({ success: false, message: 'Unauthorized access' }, { status: 401 });
+
     const url = new URL(req.url);
     const limitParam = url.searchParams.get('limit');
     const limit = limitParam ? parseInt(limitParam, 10) : 100;

@@ -1,8 +1,12 @@
 import { NextResponse } from 'next/server';
 import { pool } from '@/lib/db';
+import { verifyDbSession } from '@/lib/auth-db';
 
 export async function GET() {
   try {
+    const session = await verifyDbSession();
+    if (!session) return NextResponse.json({ success: false, message: 'Unauthorized access' }, { status: 401 });
+
     const res = await pool.query('SELECT *, type AS category FROM products ORDER BY id ASC');
     return NextResponse.json({ success: true, data: res.rows });
   } catch (error) {
@@ -13,6 +17,9 @@ export async function GET() {
 
 export async function POST(req: Request) {
   try {
+    const session = await verifyDbSession();
+    if (!session) return NextResponse.json({ success: false, message: 'Unauthorized access' }, { status: 401 });
+
     const payload = await req.json();
     const type = payload.category || payload.type || 'general';
 
@@ -79,6 +86,9 @@ export async function POST(req: Request) {
 
 export async function PUT(req: Request) {
   try {
+    const session = await verifyDbSession();
+    if (!session) return NextResponse.json({ success: false, message: 'Unauthorized access' }, { status: 401 });
+
     const payload = await req.json();
     const { id } = payload;
     if (!id) return NextResponse.json({ success: false, message: 'Product id required' }, { status: 400 });
@@ -181,6 +191,9 @@ export async function PUT(req: Request) {
 
 export async function DELETE(req: Request) {
   try {
+    const session = await verifyDbSession();
+    if (!session) return NextResponse.json({ success: false, message: 'Unauthorized access' }, { status: 401 });
+
     const { id } = await req.json();
     if (!id) return NextResponse.json({ success: false, message: 'Product id required' }, { status: 400 });
 
