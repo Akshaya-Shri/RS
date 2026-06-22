@@ -2,7 +2,12 @@ const { Client } = require('pg');
 const fs = require('fs');
 const path = require('path');
 
-const connectionString = 'postgresql://postgres:1234@localhost:5432/revathi_store';
+const connectionString = process.env.DATABASE_URL ||
+  `postgresql://${process.env.DB_USER || 'postgres'}:${process.env.DB_PASSWORD || ''}@${process.env.DB_HOST || 'localhost'}:${process.env.DB_PORT || 5432}/${process.env.DB_NAME || 'revathi_store'}`;
+
+if (!process.env.DATABASE_URL && !process.env.DB_HOST) {
+  console.warn('Warning: No DATABASE_URL or DB_HOST set. Falling back to localhost defaults — set these for production.');
+}
 
 async function main() {
   const client = new Client({ connectionString });

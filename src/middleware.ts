@@ -3,16 +3,16 @@ import type { NextRequest } from 'next/server';
 import { verifySession } from '@/lib/auth';
 
 export async function middleware(request: NextRequest) {
-  const ADMIN_JWT_SECRET = process.env.ADMIN_JWT_SECRET || 'default_super_secret_key_for_revathi_store_admin_portal';
+  const ADMIN_JWT_SECRET = process.env.ADMIN_JWT_SECRET;
 
   // If user is trying to access an admin page
   if (request.nextUrl.pathname.startsWith('/admin')) {
-    
+
     // Check if they are accessing the login page itself (handle trailing slash)
     if (request.nextUrl.pathname.startsWith('/admin/login')) {
       const authCookie = request.cookies.get('revathi_admin_auth');
-      const session = authCookie ? await verifySession(authCookie.value, ADMIN_JWT_SECRET) : null;
-      
+      const session = (authCookie && ADMIN_JWT_SECRET) ? await verifySession(authCookie.value, ADMIN_JWT_SECRET) : null;
+
       // If already logged in, redirect to admin home
       if (session) {
         const dashboardUrl = new URL('/admin', request.url);
@@ -23,8 +23,8 @@ export async function middleware(request: NextRequest) {
 
     // Check for our secure signed auth cookie
     const authCookie = request.cookies.get('revathi_admin_auth');
-    const session = authCookie ? await verifySession(authCookie.value, ADMIN_JWT_SECRET) : null;
-    
+    const session = (authCookie && ADMIN_JWT_SECRET) ? await verifySession(authCookie.value, ADMIN_JWT_SECRET) : null;
+
     if (!session) {
       // Redirect to login if not authenticated
       const loginUrl = new URL('/admin/login', request.url);
@@ -34,12 +34,12 @@ export async function middleware(request: NextRequest) {
 
   // Also protect admin API routes from unauthorized external calls
   // Exclude login and logout endpoints so users can hit them unauthenticated if necessary
-  if (request.nextUrl.pathname.startsWith('/api/admin') && 
+  if (request.nextUrl.pathname.startsWith('/api/admin') &&
       !request.nextUrl.pathname.startsWith('/api/admin/login') &&
       !request.nextUrl.pathname.startsWith('/api/admin/logout')) {
     const authCookie = request.cookies.get('revathi_admin_auth');
-    const session = authCookie ? await verifySession(authCookie.value, ADMIN_JWT_SECRET) : null;
-    
+    const session = (authCookie && ADMIN_JWT_SECRET) ? await verifySession(authCookie.value, ADMIN_JWT_SECRET) : null;
+
     if (!session) {
       return NextResponse.json({ success: false, message: 'Unauthorized access' }, { status: 401 });
     }

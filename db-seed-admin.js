@@ -20,12 +20,17 @@ if (fs.existsSync(envPath)) {
   });
 }
 
-const connectionString = env.DATABASE_URL || 
-  `postgresql://${env.DB_USER || 'postgres'}:${env.DB_PASSWORD || '1234'}@${env.DB_HOST || 'localhost'}:${env.DB_PORT || 5432}/${env.DB_NAME || 'revathi_store'}`;
+const connectionString = env.DATABASE_URL ||
+  `postgresql://${env.DB_USER || 'postgres'}:${env.DB_PASSWORD || ''}@${env.DB_HOST || 'localhost'}:${env.DB_PORT || 5432}/${env.DB_NAME || 'revathi_store'}`;
 
 const ADMIN_USER = env.ADMIN_USER || 'admin';
-const ADMIN_PASS = env.ADMIN_PASS || 'admin123';
+const ADMIN_PASS = env.ADMIN_PASS;
 const ADMIN_EMAIL = env.ADMIN_EMAIL || 'admin@revathistore.com';
+
+if (!ADMIN_PASS) {
+  console.error('Error: ADMIN_PASS environment variable is required. Set it in .env.local or as an environment variable.');
+  process.exit(1);
+}
 
 async function main() {
   console.log('Connecting to database for seeding...');

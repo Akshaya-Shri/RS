@@ -7,7 +7,10 @@ import bcrypt from 'bcryptjs';
 export async function POST(req: Request) {
   try {
     const { username, password } = await req.json();
-    const ADMIN_JWT_SECRET = process.env.ADMIN_JWT_SECRET || 'default_super_secret_key_for_revathi_store_admin_portal';
+    const ADMIN_JWT_SECRET = process.env.ADMIN_JWT_SECRET;
+    if (!ADMIN_JWT_SECRET) {
+      return NextResponse.json({ success: false, message: 'Server configuration error' }, { status: 500 });
+    }
 
     // Query database for admin user matching name or email and role = 'admin'
     const res = await pool.query(

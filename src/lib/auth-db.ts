@@ -13,7 +13,8 @@ export async function verifyDbSession() {
     if (!authCookie) return null;
 
     const token = authCookie.value;
-    const ADMIN_JWT_SECRET = process.env.ADMIN_JWT_SECRET || 'default_super_secret_key_for_revathi_store_admin_portal';
+    const ADMIN_JWT_SECRET = process.env.ADMIN_JWT_SECRET;
+    if (!ADMIN_JWT_SECRET) return null;
 
     // 1. Cryptographic cryptographic verification
     const payload = await verifySession(token, ADMIN_JWT_SECRET);

@@ -60,7 +60,7 @@ async function runTest() {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         username: env.ADMIN_USER || 'admin',
-        password: env.ADMIN_PASS || 'admin123'
+        password: env.ADMIN_PASS || ''
       })
     });
     if (!loginRes.ok) {

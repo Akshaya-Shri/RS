@@ -59,10 +59,7 @@ async function runTest() {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         username: env.ADMIN_USER || 'admin',
-        password: env.ADMIN_PASS || 'admin123'
-      })
-    });
-    if (!loginRes0.ok) {
+        password: env.ADMIN_PASS || ''
       throw new Error(`Admin login returned status ${loginRes0.status}`);
     }
     const loginJson0 = await loginRes0.json();
@@ -180,7 +177,7 @@ async function runTest() {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         username: env.ADMIN_USER || 'admin',
-        password: env.ADMIN_PASS || 'admin123'
+        password: env.ADMIN_PASS || ''
       })
     });
     if (!loginRes.ok) {
