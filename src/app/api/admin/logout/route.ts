@@ -23,8 +23,8 @@ export async function POST(req: Request) {
           const userId = userRes.rows[0].id;
           // 2. Log logout event in audit_logs table
           await pool.query(
-            "INSERT INTO audit_logs (entity_type, entity_id, action, performed_by, data) VALUES ('user', $1, 'logout', $1, $2)",
-            [userId, JSON.stringify({ reason: 'user logout' })]
+            "INSERT INTO audit_logs (entity_type, entity_id, action, performed_by, data) VALUES ('user', $1, 'logout', $2, $3)",
+            [userId, String(userId), JSON.stringify({ reason: 'user logout' })]
           );
         }
       }

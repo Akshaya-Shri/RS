@@ -1,12 +1,23 @@
 "use client";
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Image from 'next/image';
 
 export default function AdminSettingsPage() {
   const [formFile, setFormFile] = useState<File | null>(null);
   const [isUploading, setIsUploading] = useState(false);
   const [qrUrl, setQrUrl] = useState('/images/qr-payment.png');
+
+  useEffect(() => {
+    fetch('/api/admin/upload')
+      .then(res => res.json())
+      .then(data => {
+        if (data.success && data.url) {
+          setQrUrl(data.url);
+        }
+      })
+      .catch(err => console.error('Failed to fetch QR url:', err));
+  }, []);
 
   const handleUploadNewQR = async () => {
     if (!formFile) {

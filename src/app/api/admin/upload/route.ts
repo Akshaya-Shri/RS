@@ -4,9 +4,24 @@ import fs from 'fs';
 import path from 'path';
 import { verifySession } from '@/lib/auth';
 import { validateUploadFile } from '@/lib/upload';
+import { put } from '@vercel/blob';
+import { pool } from '@/lib/db';
 
 function ensureDir(dir: string) {
   if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
+}
+
+export async function GET() {
+  try {
+    const res = await pool.query("SELECT value FROM settings WHERE key = 'qr_payment_url'");
+    if (res.rowCount && res.rowCount > 0) {
+      return NextResponse.json({ success: true, url: res.rows[0].value });
+    }
+    return NextResponse.json({ success: true, url: '/images/qr-payment.png' });
+  } catch (error) {
+    console.error('Failed to fetch payment QR setting:', error);
+    return NextResponse.json({ success: true, url: '/images/qr-payment.png' });
+  }
 }
 
 export async function POST(req: Request) {
@@ -42,19 +57,49 @@ export async function POST(req: Request) {
       const bytes = await file.arrayBuffer();
       const buffer = Buffer.from(bytes);
 
-      const uploadDir = isQR
-        ? path.join(process.cwd(), 'public', 'images')
-        : path.join(process.cwd(), 'public', 'images', 'Oilimages');
+      if (process.env.BLOB_READ_WRITE_TOKEN || process.env.BLOB_STORE_ID) {
+        // Vercel Blob Upload
+        const pathname = isQR
+          ? `images/qr-payment.png`
+          : `images/Oilimages/${Date.now()}-${validation.sanitizedName}`;
 
-      ensureDir(uploadDir);
+        const blob = await put(pathname, buffer, {
+          access: 'public',
+          contentType: file.type || 'image/png'
+        });
 
-      const finalFilename = isQR ? 'qr-payment.png' : `${Date.now()}-${validation.sanitizedName}`;
-      const filePath = path.join(uploadDir, finalFilename);
+        if (isQR) {
+          await pool.query(
+            "INSERT INTO settings (key, value) VALUES ('qr_payment_url', $1) ON CONFLICT (key) DO UPDATE SET value = EXCLUDED.value",
+            [blob.url]
+          );
+        }
 
-      fs.writeFileSync(filePath, buffer);
+        return NextResponse.json({ success: true, url: blob.url });
+      } else {
+        // Local fallback
+        const uploadDir = isQR
+          ? path.join(process.cwd(), 'public', 'images')
+          : path.join(process.cwd(), 'public', 'images', 'Oilimages');
 
-      const publicUrl = isQR ? `/images/${finalFilename}` : `/images/Oilimages/${finalFilename}`;
-      return NextResponse.json({ success: true, url: publicUrl });
+        ensureDir(uploadDir);
+
+        const finalFilename = isQR ? 'qr-payment.png' : `${Date.now()}-${validation.sanitizedName}`;
+        const filePath = path.join(uploadDir, finalFilename);
+
+        fs.writeFileSync(filePath, buffer);
+
+        const publicUrl = isQR ? `/images/${finalFilename}` : `/images/Oilimages/${finalFilename}`;
+        
+        if (isQR) {
+          await pool.query(
+            "INSERT INTO settings (key, value) VALUES ('qr_payment_url', $1) ON CONFLICT (key) DO UPDATE SET value = EXCLUDED.value",
+            [publicUrl]
+          );
+        }
+
+        return NextResponse.json({ success: true, url: publicUrl });
+      }
     }
 
     // JSON base64 data upload
@@ -76,22 +121,53 @@ export async function POST(req: Request) {
       return NextResponse.json({ success: false, message: validation.message || 'Invalid file' }, { status: 400 });
     }
 
-    const uploadDir = isQR
-      ? path.join(process.cwd(), 'public', 'images')
-      : path.join(process.cwd(), 'public', 'uploads');
+    if (process.env.BLOB_READ_WRITE_TOKEN || process.env.BLOB_STORE_ID) {
+      // Vercel Blob Upload
+      const pathname = isQR
+        ? `images/qr-payment.png`
+        : `uploads/${Date.now()}-${validation.sanitizedName}`;
 
-    ensureDir(uploadDir);
+      const blob = await put(pathname, buffer, {
+        access: 'public',
+        contentType: mimeType
+      });
 
-    const finalFilename = isQR ? 'qr-payment.png' : `${Date.now()}-${validation.sanitizedName}`;
-    const filePath = path.join(uploadDir, finalFilename);
+      if (isQR) {
+        await pool.query(
+          "INSERT INTO settings (key, value) VALUES ('qr_payment_url', $1) ON CONFLICT (key) DO UPDATE SET value = EXCLUDED.value",
+          [blob.url]
+        );
+      }
 
-    fs.writeFileSync(filePath, buffer);
+      return NextResponse.json({ success: true, url: blob.url });
+    } else {
+      // Local fallback
+      const uploadDir = isQR
+        ? path.join(process.cwd(), 'public', 'images')
+        : path.join(process.cwd(), 'public', 'uploads');
 
-    const publicUrl = isQR ? `/images/${finalFilename}` : `/uploads/${finalFilename}`;
-    return NextResponse.json({ success: true, url: publicUrl });
+      ensureDir(uploadDir);
+
+      const finalFilename = isQR ? 'qr-payment.png' : `${Date.now()}-${validation.sanitizedName}`;
+      const filePath = path.join(uploadDir, finalFilename);
+
+      fs.writeFileSync(filePath, buffer);
+
+      const publicUrl = isQR ? `/images/${finalFilename}` : `/uploads/${finalFilename}`;
+      
+      if (isQR) {
+        await pool.query(
+          "INSERT INTO settings (key, value) VALUES ('qr_payment_url', $1) ON CONFLICT (key) DO UPDATE SET value = EXCLUDED.value",
+          [publicUrl]
+        );
+      }
+
+      return NextResponse.json({ success: true, url: publicUrl });
+    }
 
   } catch (error) {
     console.error('Upload Error:', error);
     return NextResponse.json({ success: false, message: 'Failed to upload file' }, { status: 500 });
   }
 }
+

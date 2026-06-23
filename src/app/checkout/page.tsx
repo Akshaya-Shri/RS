@@ -12,6 +12,7 @@ export default function CheckoutPage() {
   const [file, setFile] = useState<File | null>(null);
   const [mounted, setMounted] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [qrUrl, setQrUrl] = useState('/images/qr-payment.png');
   const [formData, setFormData] = useState({
     name: '',
     phone: '',
@@ -28,6 +29,14 @@ export default function CheckoutPage() {
 
   useEffect(() => {
     setMounted(true);
+    fetch('/api/admin/upload')
+      .then(res => res.json())
+      .then(data => {
+        if (data.success && data.url) {
+          setQrUrl(data.url);
+        }
+      })
+      .catch(err => console.error('Failed to fetch QR url:', err));
   }, []);
 
   if (!mounted) return null;
@@ -231,7 +240,7 @@ export default function CheckoutPage() {
               <div className="relative p-4 bg-white rounded-2xl shadow-xl border border-neutral-100 w-64 h-64 flex flex-col items-center justify-center">
                 <div className="absolute inset-0 border-2 border-dashed border-primary/50 rounded-2xl opacity-50 pulse-border"></div>
                 <div className="relative w-[180px] h-[180px] z-10 bg-white p-2 rounded-xl">
-                  <Image src="/images/qr-payment.png" alt="Payment QR Code" fill className="object-contain" unoptimized />
+                  <Image src={qrUrl} alt="Payment QR Code" fill className="object-contain" unoptimized />
                 </div>
                 <p className="mt-4 text-xs font-bold text-neutral-500 uppercase tracking-widest text-center z-10 relative">GPay • PhonePe<br/>Paytm</p>
               </div>
