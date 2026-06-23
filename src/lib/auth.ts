@@ -1,104 +1,39 @@
-const encoder = new TextEncoder();
-const decoder = new TextDecoder();
+import bcrypt from 'bcryptjs';
+import jwt from 'jsonwebtoken';
 
-function toBase64Url(str: string): string {
-  return str.replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+const JWT_SECRET = process.env.JWT_SECRET || 'revathi-store-erp-super-secret-key-1975-oil-mill';
+
+export function hashPassword(password: string): string {
+  return bcrypt.hashSync(password, 10);
 }
 
-function fromBase64Url(str: string): string {
-  let base64 = str.replace(/-/g, '+').replace(/_/g, '/');
-  while (base64.length % 4) {
-    base64 += '=';
-  }
-  return base64;
+export function comparePassword(password: string, hash: string): boolean {
+  return bcrypt.compareSync(password, hash);
 }
 
-async function getCryptoKey(secret: string): Promise<CryptoKey> {
-  const keyData = encoder.encode(secret);
-  return crypto.subtle.importKey(
-    'raw',
-    keyData,
-    { name: 'HMAC', hash: 'SHA-256' },
-    false,
-    ['sign', 'verify']
-  );
+export function signToken(payload: { userId: number; username: string; role: string }): string {
+  return jwt.sign(payload, JWT_SECRET, { expiresIn: '24h' });
 }
 
-export interface SessionPayload {
-  username: string;
-  expiresAt: number;
-}
-
-/**
- * Generates a signed session token.
- */
-export async function signSession(payload: SessionPayload, secret: string): Promise<string> {
-  const jsonStr = JSON.stringify(payload);
-  const payloadBytes = encoder.encode(jsonStr);
-  let payloadBinary = '';
-  for (let i = 0; i < payloadBytes.byteLength; i++) {
-    payloadBinary += String.fromCharCode(payloadBytes[i]);
-  }
-  const payloadStr = toBase64Url(btoa(payloadBinary));
-  const key = await getCryptoKey(secret);
-  const signature = await crypto.subtle.sign(
-    'HMAC',
-    key,
-    encoder.encode(payloadStr)
-  );
-  
-  // Convert signature array buffer to base64url string
-  const sigBytes = new Uint8Array(signature);
-  let binary = '';
-  for (let i = 0; i < sigBytes.byteLength; i++) {
-    binary += String.fromCharCode(sigBytes[i]);
-  }
-  const sigStr = toBase64Url(btoa(binary));
-  
-  return `${payloadStr}.${sigStr}`;
-}
-
-/**
- * Verifies a signed session token and returns the payload if valid.
- */
-export async function verifySession(token: string, secret: string): Promise<SessionPayload | null> {
+export function verifyToken(token: string): { userId: number; username: string; role: string } | null {
   try {
-    const parts = token.split('.');
-    if (parts.length !== 2) return null;
-    const [payloadStr, sigStr] = parts;
-    const key = await getCryptoKey(secret);
-    
-    // Decode signature
-    const sigBinary = atob(fromBase64Url(sigStr));
-    const sigBytes = new Uint8Array(sigBinary.length);
-    for (let i = 0; i < sigBinary.length; i++) {
-      sigBytes[i] = sigBinary.charCodeAt(i);
+    return jwt.verify(token, JWT_SECRET) as { userId: number; username: string; role: string };
+  } catch (error) {
+    return null;
+  }
+}
+
+export async function verifySession(token: string, secret?: string): Promise<{ userId: number; username: string; role: string } | null> {
+  try {
+    const key = secret || JWT_SECRET;
+    try {
+      return jwt.verify(token, key) as { userId: number; username: string; role: string };
+    } catch (e) {
+      if (key !== JWT_SECRET) {
+        return jwt.verify(token, JWT_SECRET) as { userId: number; username: string; role: string };
+      }
+      throw e;
     }
-    
-    const isValid = await crypto.subtle.verify(
-      'HMAC',
-      key,
-      sigBytes,
-      encoder.encode(payloadStr)
-    );
-    
-    if (!isValid) return null;
-    
-    // Decode and parse payload safely using TextDecoder for UTF-8
-    const payloadBinary = atob(fromBase64Url(payloadStr));
-    const payloadBytes = new Uint8Array(payloadBinary.length);
-    for (let i = 0; i < payloadBinary.length; i++) {
-      payloadBytes[i] = payloadBinary.charCodeAt(i);
-    }
-    const payloadJson = decoder.decode(payloadBytes);
-    const payload = JSON.parse(payloadJson) as SessionPayload;
-    
-    // Verify expiration
-    if (payload.expiresAt && payload.expiresAt < Date.now()) {
-      return null;
-    }
-    
-    return payload;
   } catch (error) {
     return null;
   }

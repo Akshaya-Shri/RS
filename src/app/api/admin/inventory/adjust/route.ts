@@ -83,6 +83,12 @@ export async function POST(req: Request) {
       stock_updated_at
     ]);
 
+    // Insert into centralized audit_logs
+    await client.query(
+      'INSERT INTO audit_logs (action, entity_type, entity_id, performed_by) VALUES ($1, $2, $3, $4)',
+      [`Adjust Stock (${type}: ${change > 0 ? '+' : ''}${change})`, 'products', product_id, session.username || user]
+    );
+
     await client.query('COMMIT');
     return NextResponse.json({ success: true, data: updateRes.rows[0] });
   } catch (error) {

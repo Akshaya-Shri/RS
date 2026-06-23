@@ -6,10 +6,10 @@ export async function GET(request: Request) {
     const { searchParams } = new URL(request.url);
     const category = searchParams.get('category');
 
-    let query = 'SELECT *, type AS category FROM products';
+    let query = 'SELECT *, type AS category FROM products WHERE deleted_at IS NULL';
     const params: any[] = [];
     if (category) {
-      query += ' WHERE type = $1';
+      query += ' AND type = $1';
       params.push(category);
     }
     query += ' ORDER BY id ASC';

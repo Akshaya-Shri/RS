@@ -2,12 +2,24 @@ import { NextResponse } from 'next/server';
 import { pool } from '@/lib/db';
 import { verifyDbSession } from '@/lib/auth-db';
 
+// helper to log audit entries
+async function logAudit(action: string, entityType: string, entityId: number, performedBy: string) {
+  try {
+    await pool.query(
+      'INSERT INTO audit_logs (action, entity_type, entity_id, performed_by) VALUES ($1, $2, $3, $4)',
+      [action, entityType, entityId, performedBy]
+    );
+  } catch (err) {
+    console.error('Audit log failed:', err);
+  }
+}
+
 export async function GET() {
   try {
     const session = await verifyDbSession();
     if (!session) return NextResponse.json({ success: false, message: 'Unauthorized access' }, { status: 401 });
 
-    const res = await pool.query('SELECT *, type AS category FROM products ORDER BY id ASC');
+    const res = await pool.query('SELECT *, type AS category FROM products WHERE deleted_at IS NULL ORDER BY id ASC');
     return NextResponse.json({ success: true, data: res.rows });
   } catch (error) {
     console.error('Failed to read products:', error);
@@ -77,7 +89,11 @@ export async function POST(req: Request) {
     ];
 
     const result = await pool.query(insertQuery, values);
-    return NextResponse.json({ success: true, data: result.rows[0] }, { status: 201 });
+    const newProduct = result.rows[0];
+
+    await logAudit('Create Product', 'products', newProduct.id, 'admin');
+
+    return NextResponse.json({ success: true, data: newProduct }, { status: 201 });
   } catch (error) {
     console.error('Failed to create product:', error);
     return NextResponse.json({ success: false, message: 'Failed to create product' }, { status: 500 });
@@ -94,7 +110,7 @@ export async function PUT(req: Request) {
     if (!id) return NextResponse.json({ success: false, message: 'Product id required' }, { status: 400 });
 
     // Fetch existing product to merge partial updates safely
-    const existing = await pool.query('SELECT * FROM products WHERE id = $1', [id]);
+    const existing = await pool.query('SELECT * FROM products WHERE id = $1 AND deleted_at IS NULL', [id]);
     if (existing.rowCount === 0) {
       return NextResponse.json({ success: false, message: 'Product not found' }, { status: 404 });
     }
@@ -139,7 +155,7 @@ export async function PUT(req: Request) {
         low_stock_threshold = $32,
         stock_status = $33,
         stock_updated_at = $34
-      WHERE id = $35
+      WHERE id = $35 AND deleted_at IS NULL
       RETURNING *, type AS category
     `;
 
@@ -182,7 +198,11 @@ export async function PUT(req: Request) {
     ];
 
     const result = await pool.query(updateQuery, values);
-    return NextResponse.json({ success: true, data: result.rows[0] });
+    const updatedProduct = result.rows[0];
+
+    await logAudit('Update Product', 'products', updatedProduct.id, 'admin');
+
+    return NextResponse.json({ success: true, data: updatedProduct });
   } catch (error) {
     console.error('Failed to update product:', error);
     return NextResponse.json({ success: false, message: 'Failed to update product' }, { status: 500 });
@@ -197,10 +217,14 @@ export async function DELETE(req: Request) {
     const { id } = await req.json();
     if (!id) return NextResponse.json({ success: false, message: 'Product id required' }, { status: 400 });
 
-    const result = await pool.query('DELETE FROM products WHERE id = $1', [id]);
+    // Soft delete only as per BRD rules
+    const result = await pool.query('UPDATE products SET deleted_at = now() WHERE id = $1 AND deleted_at IS NULL RETURNING *', [id]);
     if (result.rowCount === 0) {
       return NextResponse.json({ success: false, message: 'Product not found' }, { status: 404 });
     }
+
+    await logAudit('Soft Delete Product', 'products', id, 'admin');
+
     return NextResponse.json({ success: true });
   } catch (error) {
     console.error('Failed to delete product:', error);
