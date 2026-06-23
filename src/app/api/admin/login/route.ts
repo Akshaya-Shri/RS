@@ -17,8 +17,7 @@ export async function POST(req: Request) {
     }
 
     // Connect to database and fetch user
-    const userResult = await pool.query('SELECT * FROM users WHERE username = $1 AND role = \'admin\'', [username]);
-    if (userResult.rows.length === 0) {
+    const userResult = await pool.query('SELECT * FROM users WHERE (name = $1 OR email = $1) AND role = \'admin\'', [username]); if (userResult.rows.length === 0) {
       return NextResponse.json({ success: false, message: 'Invalid credentials' }, { status: 401 });
     }
 
@@ -33,7 +32,7 @@ export async function POST(req: Request) {
     // Sign secure JWT token
     const token = signToken({
       userId: user.id,
-      username: user.username,
+      username: user.name,
       role: user.role
     });
 
