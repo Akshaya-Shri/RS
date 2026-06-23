@@ -27,6 +27,9 @@ const DB_PORT = parseInt(env.DB_PORT || '5432');
 const BASE_URL = 'http://localhost:3000';
 
 function getDbClient() {
+  if (env.DATABASE_URL) {
+    return new Client({ connectionString: env.DATABASE_URL });
+  }
   return new Client({
     host: DB_HOST,
     user: DB_USER,

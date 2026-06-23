@@ -48,15 +48,24 @@ export async function POST(req: Request) {
       maxAge: 60 * 60 * 24
     });
 
-    // Save login log
+    // Save login log and session
     try {
       const ip = req.headers.get('x-forwarded-for') || '127.0.0.1';
+      const userAgent = req.headers.get('user-agent') || 'unknown';
+      
+      // Save login log
       await pool.query(
         'INSERT INTO login_logs (user_id, ip_address) VALUES ($1, $2)',
         [user.id, ip]
       );
+
+      // Save user session for DB session verification
+      await pool.query(
+        'INSERT INTO user_sessions (user_id, token, ip_address, user_agent) VALUES ($1, $2, $3, $4)',
+        [user.id, token, ip, userAgent]
+      );
     } catch (logErr) {
-      console.error('Failed to write login log:', logErr);
+      console.error('Failed to write login log or session:', logErr);
     }
 
     return response;

@@ -30,13 +30,15 @@ async function runTest() {
   console.log('--- STARTING END-TO-END ORDER TESTING ---');
   
   // Connect to the DB
-  const client = new Client({
-    host: DB_HOST,
-    user: DB_USER,
-    password: DB_PASSWORD,
-    database: DB_NAME,
-    port: DB_PORT
-  });
+  const client = env.DATABASE_URL 
+    ? new Client({ connectionString: env.DATABASE_URL })
+    : new Client({
+        host: DB_HOST,
+        user: DB_USER,
+        password: DB_PASSWORD,
+        database: DB_NAME,
+        port: DB_PORT
+      });
   
   try {
     await client.connect();
