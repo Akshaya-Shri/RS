@@ -197,7 +197,7 @@ export default function AdminOrdersPage() {
 
                 <div className="p-6 space-y-6">
                   {/* Order Info */}
-                  <div className="grid grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
                       <h3 className="font-bold text-neutral-700 mb-2">Customer Details</h3>
                       <p className="text-sm text-neutral-600">
@@ -234,23 +234,8 @@ export default function AdminOrdersPage() {
                   {/* Order Items */}
                   {selectedOrder.items && selectedOrder.items.length > 0 && (
                     <div>
-                    <div className="p-6 border-t border-neutral-200 flex justify-end gap-3">
-                      <button
-                        onClick={() => updateOrderStatus(selectedOrder.id, 'shipped')}
-                        disabled={updatingStatus === selectedOrder.id || selectedOrder.status === 'shipped'}
-                        className="px-4 py-2 bg-purple-600 text-white rounded-lg font-bold hover:bg-purple-700 disabled:opacity-50"
-                      >
-                        {updatingStatus === selectedOrder.id ? 'Updating…' : 'Mark Shipped'}
-                      </button>
-                      <button
-                        onClick={() => setSelectedOrder(null)}
-                        className="px-4 py-2 bg-neutral-100 text-neutral-700 rounded-lg font-bold hover:bg-neutral-200"
-                      >
-                        Close
-                      </button>
-                    </div>
                       <h3 className="font-bold text-neutral-700 mb-2">Order Items</h3>
-                      <div className="border border-neutral-200 rounded-lg overflow-hidden">
+                      <div className="border border-neutral-200 rounded-lg overflow-x-auto">
                         <table className="w-full">
                           <thead className="bg-neutral-50">
                             <tr>
@@ -276,6 +261,23 @@ export default function AdminOrdersPage() {
                       </div>
                     </div>
                   )}
+                </div>
+
+                {/* Modal Footer */}
+                <div className="p-6 border-t border-neutral-200 flex justify-end gap-3 bg-neutral-50 rounded-b-2xl">
+                  <button
+                    onClick={() => updateOrderStatus(selectedOrder.id, 'shipped')}
+                    disabled={updatingStatus === selectedOrder.id || selectedOrder.status === 'shipped'}
+                    className="px-4 py-2 bg-purple-600 text-white rounded-lg font-bold hover:bg-purple-700 disabled:opacity-50 cursor-pointer"
+                  >
+                    {updatingStatus === selectedOrder.id ? 'Updating…' : 'Mark Shipped'}
+                  </button>
+                  <button
+                    onClick={() => setSelectedOrder(null)}
+                    className="px-4 py-2 bg-neutral-100 text-neutral-700 rounded-lg font-bold hover:bg-neutral-200 cursor-pointer"
+                  >
+                    Close
+                  </button>
                 </div>
               </div>
             </div>

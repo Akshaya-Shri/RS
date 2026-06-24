@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { useState, useEffect } from 'react';
 
 export default function AdminLayout({
   children,
@@ -9,6 +10,24 @@ export default function AdminLayout({
   children: React.ReactNode;
 }) {
   const pathname = usePathname();
+  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+
+  // Lock scroll when drawer is open on mobile
+  useEffect(() => {
+    if (isDrawerOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, [isDrawerOpen]);
+
+  const isLoginPage = pathname === '/admin/login';
+  if (isLoginPage) {
+    return <>{children}</>;
+  }
 
   const links = [
     { href: '/admin', label: 'Dashboard', icon: 'M4 6a2 2 0 012-2h2a2 2 0 012 2v4a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v4a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v4a2 2 0 01-2 2H6a2 2 0 01-2-2v-4zM14 16a2 2 0 012-2h2a2 2 0 012 2v4a2 2 0 01-2 2h-2a2 2 0 01-2-2v-4z' },
@@ -17,7 +36,7 @@ export default function AdminLayout({
     { href: '/admin/suppliers', label: 'Suppliers', icon: 'M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4' },
     { href: '/admin/purchases', label: 'Purchases', icon: 'M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z' },
     { href: '/admin/payments', label: 'Payments', icon: 'M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z' },
-    { href: '/admin/profit', label: 'Profit Analysis', icon: 'M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z' },
+    { href: '/admin/profit', label: 'Profit Analysis', icon: 'M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2m0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z' },
     { href: '/admin/tins', label: 'Tin Management', icon: 'M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-14v14m0-14L4 7m0 0v10l8 4' },
     { href: '/admin/attendance', label: 'Attendance', icon: 'M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z' },
     { href: '/admin/reports', label: 'Reports Hub', icon: 'M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z' },
@@ -28,9 +47,9 @@ export default function AdminLayout({
   ];
 
   return (
-    <div className="flex-1 bg-neutral-50 flex pb-12 w-full h-full min-h-[calc(100vh-80px)]">
-      {/* Sidebar Navigation */}
-      <aside className="w-64 bg-white border-r border-neutral-200 hidden lg:flex flex-col">
+    <div className="flex-1 bg-neutral-50 flex flex-col lg:flex-row pb-12 w-full h-full min-h-[calc(100vh-80px)]">
+      {/* Desktop Sidebar Navigation */}
+      <aside className="w-64 bg-white border-r border-neutral-200 hidden lg:flex flex-col shrink-0">
         <div className="p-6 border-b border-neutral-100">
           <h2 className="text-xl font-extrabold text-primary flex items-center gap-2">
             <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -79,31 +98,98 @@ export default function AdminLayout({
       {/* Main Content Area */}
       <div className="flex-1 overflow-y-auto w-full flex flex-col">
          {/* Mobile Nav Header */}
-         <div className="lg:hidden bg-white border-b border-neutral-200 p-4 flex gap-2 overflow-x-auto items-center">
-            {links.slice(0, 7).map((link) => {
-              const isActive = pathname === link.href;
-              return (
-                <Link 
-                  key={link.href}
-                  href={link.href} 
-                  className={`px-3 py-1.5 rounded-full whitespace-nowrap font-bold text-xs ${
-                    isActive ? 'bg-primary text-white' : 'bg-neutral-100 text-neutral-600'
-                  }`}
-                >
-                  {link.label}
-                </Link>
-              );
-            })}
+         <div className="lg:hidden bg-white border-b border-neutral-200 p-4 sticky top-0 z-35 flex items-center justify-between shadow-sm">
+            <h2 className="text-lg font-extrabold text-primary flex items-center gap-2">
+              <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+              </svg>
+              Revathi ERP
+            </h2>
             <button 
-               onClick={async () => {
-                 await fetch('/api/admin/login', { method: 'POST', body: JSON.stringify({ action: 'logout' }) });
-                 window.location.href = '/admin/login';
-               }}
-               className="px-3 py-1.5 bg-red-50 text-red-600 rounded-full whitespace-nowrap font-bold text-xs"
+              onClick={() => setIsDrawerOpen(true)}
+              className="p-2 text-neutral-600 hover:bg-neutral-50 rounded-xl border border-neutral-200/60 transition-colors"
+              aria-label="Open navigation menu"
             >
-               Sign Out
+              <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 12h16M4 18h16" />
+              </svg>
             </button>
          </div>
+
+         {/* Mobile Side Drawer Menu */}
+         {isDrawerOpen && (
+           <div className="fixed inset-0 z-50 lg:hidden flex">
+             {/* Backdrop overlay */}
+             <div 
+               className="fixed inset-0 bg-neutral-900/40 backdrop-blur-xs transition-opacity duration-300"
+               onClick={() => setIsDrawerOpen(false)}
+             />
+
+             {/* Slide-out side drawer */}
+             <aside className="relative flex flex-col w-72 max-w-[85vw] h-full bg-white shadow-2xl z-50 animate-in slide-in-from-left duration-300">
+               {/* Drawer Brand Header */}
+               <div className="p-5 border-b border-neutral-100 flex items-center justify-between">
+                 <h2 className="text-lg font-extrabold text-primary flex items-center gap-2">
+                   <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                   </svg>
+                   Revathi ERP
+                 </h2>
+                 <button
+                   onClick={() => setIsDrawerOpen(false)}
+                   className="p-1.5 text-neutral-400 hover:text-neutral-600 hover:bg-neutral-50 rounded-lg transition-colors"
+                   aria-label="Close menu"
+                 >
+                   <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                     <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                   </svg>
+                 </button>
+               </div>
+
+               {/* Drawer Menu Links */}
+               <nav className="flex-1 flex flex-col gap-1 px-4 py-6 overflow-y-auto">
+                 {links.map((link) => {
+                   const isActive = pathname === link.href;
+                   return (
+                     <Link 
+                       key={link.href} 
+                       href={link.href}
+                       onClick={() => setIsDrawerOpen(false)}
+                       className={`flex items-center gap-3 px-4 py-2.5 rounded-xl font-bold text-sm transition-all duration-200 ${
+                         isActive 
+                           ? 'bg-primary text-white shadow-md shadow-primary/20 scale-[1.02]' 
+                           : 'text-neutral-500 hover:bg-neutral-50 hover:text-primary'
+                       }`}
+                     >
+                       <svg className="w-5 h-5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                         <path strokeLinecap="round" strokeLinejoin="round" d={link.icon} />
+                       </svg>
+                       {link.label}
+                     </Link>
+                   );
+                 })}
+               </nav>
+
+               {/* Drawer Footer Sign Out */}
+               <div className="p-4 border-t border-neutral-100 bg-neutral-50/50">
+                 <button 
+                   onClick={async () => {
+                     setIsDrawerOpen(false);
+                     await fetch('/api/admin/login', { method: 'POST', body: JSON.stringify({ action: 'logout' }) });
+                     window.location.href = '/admin/login';
+                   }}
+                   className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-red-50 text-red-600 font-bold rounded-xl hover:bg-red-100 transition-colors"
+                 >
+                   <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                     <path strokeLinecap="round" strokeLinejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                   </svg>
+                   Sign Out
+                 </button>
+               </div>
+             </aside>
+           </div>
+         )}
+
          <div className="flex-1">
             {children}
          </div>
