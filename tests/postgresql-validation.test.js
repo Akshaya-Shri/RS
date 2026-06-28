@@ -251,9 +251,9 @@ async function runTest() {
     if (!deleteRes.ok) {
       throw new Error(`Delete product returned status ${deleteRes.status}`);
     }
-    const dbDeletedRes = await client.query('SELECT 1 FROM products WHERE id = $1', [testProductId]);
+    const dbDeletedRes = await client.query('SELECT 1 FROM products WHERE id = $1 AND deleted_at IS NULL', [testProductId]);
     if (dbDeletedRes.rowCount > 0) {
-      throw new Error('Product still exists in PostgreSQL after DELETE call');
+      throw new Error('Product still exists (and is not soft-deleted) in PostgreSQL after DELETE call');
     }
     console.log('✓ Product successfully deleted from PostgreSQL.');
 
