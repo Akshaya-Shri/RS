@@ -1,0 +1,21 @@
+config:
+  target: "http://localhost:3000"
+  phases:
+    - duration: 10
+      arrivalRate: 5
+      name: "Warm-up phase (5 users/sec)"
+    - duration: 15
+      arrivalRate: 20
+      name: "Stress load phase (20 users/sec)"
+  defaults:
+    headers:
+      User-Agent: "Artillery-Stress-Test-Agent"
+
+scenarios:
+  - name: "Storefront Homepage & Products Fetch Journey"
+    flow:
+      - get:
+          url: "/"
+      - think: 1
+      - get:
+          url: "/api/products"
